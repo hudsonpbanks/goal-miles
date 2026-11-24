@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--ac:#D6F94B;--onac:#0C0E0D;--warn:#FF9A5C;--hi:#1D2312;--hib:#3E4A1C;--cond:'Barlow Condensed',sans-serif}
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1);--ease-io:cubic-bezier(0.77,0,0.175,1);--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--ac:#D6F94B;--onac:#0C0E0D;--warn:#FF9A5C;--hi:#1D2312;--hib:#3E4A1C;--cond:'Barlow Condensed',sans-serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 #s-setup .cta{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom) - 18px);margin:0 -20px calc(-1 * env(safe-area-inset-bottom) - 18px);padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(to bottom,rgba(12,14,13,0),var(--bg) 14px);z-index:5}
@@ -233,11 +233,41 @@ button:disabled{opacity:.4;cursor:default}
 .wx b{color:var(--mu2);font-weight:600}
 .wx.warn{color:var(--warn)}
 .pacer .best{height:32px;padding:0 10px;border-radius:16px;border:1.5px solid var(--line2);background:transparent;font-size:12.5px;font-weight:600;color:var(--mu2);margin-left:4px;width:auto!important}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+#splash{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sp-in{display:flex;flex-direction:column;align-items:center;gap:16px}
+.sp-ring{width:76px;height:76px}
+.sp-ring circle{fill:none;stroke-width:9}
+.sp-track{stroke:#262A27}
+.sp-arc{stroke:var(--ac);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
+.sp-word{overflow:hidden;padding:2px 4px}
+.sp-word span{display:block;font:700 34px/1.05 var(--cond);letter-spacing:.08em;text-transform:uppercase;transform:translateY(110%)}
+.sp-tag{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mu);opacity:0;transform:translateY(6px)}
+#splash.go .sp-arc{animation:spDraw 760ms var(--ease-io) 120ms forwards}
+#splash.go .sp-word span{animation:spUp 520ms var(--ease-out) 520ms forwards}
+#splash.go .sp-tag{animation:spTag 360ms var(--ease-out) 780ms forwards}
+#splash.go .sp-in{animation:spLift 380ms var(--ease-out) 1420ms forwards}
+#splash.go{animation:spOut 380ms var(--ease-out) 1420ms forwards}
+#splash.skip{animation:spOut 180ms var(--ease-out) forwards!important}
+body.intro #s-setup>*:not(.grow){animation:rise 380ms var(--ease-out) both}
+body.intro #s-setup>:nth-child(1){animation-delay:1500ms}body.intro #s-setup>:nth-child(2){animation-delay:1540ms}body.intro #s-setup>:nth-child(3){animation-delay:1580ms}body.intro #s-setup>:nth-child(4){animation-delay:1620ms}body.intro #s-setup>:nth-child(5){animation-delay:1640ms}body.intro #s-setup>:nth-child(6){animation-delay:1660ms}body.intro #s-setup>:nth-child(7){animation-delay:1700ms}body.intro #s-setup>:nth-child(n+8){animation-delay:1740ms}
+body.intro.fast #s-setup>*{animation-delay:120ms!important}
+@keyframes spFade{to{opacity:1}}
+@keyframes spDraw{to{stroke-dashoffset:33}}
+@keyframes spUp{to{transform:translateY(0)}}
+@keyframes spTag{to{opacity:1;transform:translateY(0)}}
+@keyframes spLift{to{transform:translateY(-10px) scale(.98)}}
+@keyframes spOut{to{opacity:0;visibility:hidden}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@media (prefers-reduced-motion:reduce){
+*:not(#splash){transition:none!important;animation:none!important}
+.sp-arc{stroke-dashoffset:33}.sp-word span{transform:none}.sp-tag{opacity:1;transform:none}
+#splash.go{animation:spOut 250ms ease 450ms forwards}
+}
 @media (max-height:740px){.goal .num{font-size:120px}.opt{padding:9px 0}.screen{gap:12px}}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><div class="sp-in"><svg class="sp-ring" viewBox="0 0 80 80"><circle class="sp-track" cx="40" cy="40" r="30" pathLength="100"/><circle class="sp-arc" cx="40" cy="40" r="30" pathLength="100" transform="rotate(-90 40 40)"/></svg><div class="sp-word"><span>Goal Miles</span></div><div class="sp-tag">Set the distance. Go.</div></div></div>
 
 <!-- SETUP -->
 <section class="screen on" id="s-setup" aria-label="Set goal">
@@ -1034,6 +1064,24 @@ function renderWx() {
 
 renderSetup();
 loadWeather();
+(function splash() {
+  const sp = $('#splash'), b = document.body;
+  let gone = false;
+  const done = skip => {
+    if (gone) return; gone = true;
+    if (skip) { sp.classList.add('skip'); b.classList.add('fast'); }
+    setTimeout(() => sp.remove(), skip ? 200 : 0);
+    setTimeout(() => b.classList.remove('intro', 'fast'), skip ? 600 : 700);
+  };
+  let seen = false; try { seen = sessionStorage.getItem('gm_splash'); sessionStorage.setItem('gm_splash', 1); } catch {}
+  if (T || seen) { sp.remove(); return; }
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  sp.addEventListener('click', () => done(true));
+  Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 250))]).then(() => {
+    sp.classList.add('go'); b.classList.add('intro');
+    setTimeout(() => done(false), reduce ? 720 : 1820);
+  });
+})();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
