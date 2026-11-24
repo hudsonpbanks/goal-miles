@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0E0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Goal Miles">
+<title>Goal Miles</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--ac:#D6F94B;--onac:#0C0E0D;--warn:#FF9A5C;--hi:#1D2312;--hib:#3E4A1C;--cond:'Barlow Condensed',sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+#s-setup .cta{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom) - 18px);margin:0 -20px calc(-1 * env(safe-area-inset-bottom) - 18px);padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(to bottom,rgba(12,14,13,0),var(--bg) 14px);z-index:5}
+.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.82) contrast(.9) saturate(.35)}
+.pacer .best{white-space:nowrap}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:Barlow,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button,a,input{font-family:inherit;color:inherit}
+button,a{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .12s,background-color .2s,border-color .2s;-webkit-user-select:none;user-select:none}
+button:active,a:active{opacity:.7}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+button:disabled{opacity:.4;cursor:default}
+.screen{position:fixed;inset:0;margin:0 auto;width:100%;max-width:480px;display:none;flex-direction:column;gap:16px;padding:calc(env(safe-area-inset-top) + 14px) 20px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.screen.on{display:flex}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--cond);font-weight:700;font-size:22px;letter-spacing:.04em;text-transform:uppercase}
+.title{display:flex;flex-direction:column;align-items:center;text-align:center}
+.title b{font-family:var(--cond);font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+.title span{font-size:13px;color:var(--mu)}
+.row{display:flex;gap:8px;align-items:center}
+.ib{width:44px;height:44px;flex-shrink:0;border-radius:22px;border:none;background:var(--s1);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--tx)}
+.ib svg,.rb svg{width:20px;height:20px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;background:var(--s1);border-radius:14px;padding:4px}
+.seg button{height:42px;border-radius:11px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
+.seg button[aria-checked=true]{background:var(--s3);color:var(--tx)}
+.stepper{display:flex;align-items:center;justify-content:space-between}
+.rb{width:64px;height:64px;flex-shrink:0;border-radius:32px;border:1.5px solid var(--line2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--tx);text-decoration:none}
+.rb.ac{background:var(--ac);border-color:var(--ac);color:var(--onac)}
+.rb svg{width:24px;height:24px}
+.goal{display:flex;flex-direction:column;align-items:center}
+.goal .num{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
+.muted{color:var(--mu)}
+.eta{text-align:center;margin:-4px 0 0;font-size:14px;color:var(--mu)}
+.eta b{color:var(--tx)}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.chips button{height:36px;padding:0 14px;border-radius:18px;border:1.5px solid var(--s3);background:transparent;color:var(--mu2);font-size:14px;font-weight:600}
+.chips button[aria-pressed=true]{border-color:var(--ac);color:var(--ac)}
+.card{background:var(--s1);border-radius:18px}
+.list{padding:2px 16px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.opt:last-child{border-bottom:none}
+.opt .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.opt .t b{font-size:15px;font-weight:600}
+.opt .t span{font-size:13px;color:var(--mu)}
+.sw{flex-shrink:0;width:52px;height:32px;border-radius:16px;border:none;padding:3px;background:var(--line2);display:flex;justify-content:flex-start}
+.sw::after{content:"";width:26px;height:26px;border-radius:13px;background:var(--mu);transition:transform .2s}
+.sw[aria-checked=true]{background:var(--ac)}
+.sw[aria-checked=true]::after{background:var(--onac);transform:translateX(20px)}
+.pacer{display:none;align-items:center;justify-content:space-between;padding:0 0 12px;border-bottom:1px solid var(--line)}
+.pacer.on{display:flex}
+.pacer .row button{width:40px;height:40px;border-radius:20px;border:1.5px solid var(--line2);background:transparent;font-size:20px;font-weight:600}
+.pacer .v{font-family:var(--cond);font-weight:600;font-size:24px;min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.grow{flex-grow:1}
+.cta{display:flex;gap:10px;align-items:center}
+.btn{height:64px;flex:1 1 auto;border-radius:32px;border:none;background:var(--ac);color:var(--onac);display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;font-family:var(--cond);font-weight:700;font-size:23px;letter-spacing:.08em;text-transform:uppercase}
+.btn svg{width:20px;height:20px}
+.btn.ghost{background:transparent;color:var(--tx);border:1.5px solid var(--line2);font-size:18px;height:52px}
+.pill{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:16px;background:var(--hi);border:1px solid var(--hib)}
+.pill .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.pill .t b{font-size:14px}
+.pill .t span{font-size:12.5px;color:#B9C0A6}
+.pill button{width:36px;height:36px;border-radius:18px;border:none;background:transparent;color:var(--mu2)}
+.map{position:relative;height:300px;flex-shrink:0;border-radius:22px;overflow:hidden;background:#111412}
+.map .leaflet-container{background:#111412;height:100%}
+.ov{position:absolute;z-index:500;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:17px;background:rgba(12,14,13,.9);font-size:14px;font-weight:600}
+.ov b{font-family:var(--cond);font-size:19px}
+.leaflet-control-attribution{background:rgba(12,14,13,.7)!important;color:var(--mu)!important;font-size:10px!important}
+.leaflet-control-attribution a{color:var(--mu2)!important}
+.routes{display:flex;flex-direction:column;gap:8px}
+.rt{display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:12px 16px;border-radius:16px;background:var(--s1);border:1.5px solid var(--s1);color:var(--tx);width:100%}
+.rt[aria-checked=true]{border-color:var(--ac)}
+.rt .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rt .t b{font-size:15px;font-weight:600}
+.rt .t span{font-size:13px;color:var(--mu)}
+.rt .d{font-family:var(--cond);font-weight:700;font-size:22px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.msg{padding:16px;border-radius:16px;background:var(--s1);font-size:14.5px;line-height:1.45;color:var(--mu2)}
+.msg b{color:var(--tx)}
+.msg button{margin-top:10px}
+.skel{height:62px;border-radius:16px;background:linear-gradient(90deg,var(--s1),var(--s2),var(--s1));background-size:200% 100%;animation:sk 1.2s linear infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.dot{width:10px;height:10px;border-radius:5px;background:var(--ac)}
+.dot.p{background:var(--warn)}
+.chip{display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:15px;background:var(--s1);font-size:12.5px;font-weight:500;color:var(--mu)}
+.chip i{width:8px;height:8px;border-radius:4px;background:var(--mu)}
+.chip.good i{background:var(--ac)}.chip.ok i{background:#E8C547}.chip.bad i{background:var(--warn)}
+.ring{position:relative;width:min(320px,80vw);aspect-ratio:1;align-self:center;flex-shrink:0}
+.ring svg{position:absolute;inset:0;width:100%;height:100%}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.ring .big{font-family:var(--cond);font-weight:700;font-size:min(104px,26vw);line-height:.95;font-variant-numeric:tabular-nums}
+#prog{transition:stroke-dashoffset .4s linear}
+.banner{display:none;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--hi);border:1px solid var(--hib)}
+.banner.on{display:flex}
+.banner svg{width:22px;height:22px;flex-shrink:0}
+.banner .t{display:flex;flex-direction:column;gap:1px;min-width:0}
+.banner .t b{font-size:15px}
+.banner .t span{font-size:13px;color:#B9C0A6}
+.banner.warn{background:#2A1A10;border-color:#5A3218}
+.banner.warn .t span{color:#D9B9A6}
+.banner.gb{background:var(--ac);border-color:var(--ac);color:var(--onac)}
+.banner.gb .t span{color:#2E3510}
+.turn{display:none;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:var(--s1)}
+.turn.on{display:flex}
+.turn .ar{width:44px;height:44px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.turn .ar svg{width:26px;height:26px}
+.turn .t{display:flex;flex-direction:column;min-width:0}
+.turn .t b{font-family:var(--cond);font-weight:700;font-size:24px;line-height:1}
+.turn .t span{font-size:14px;color:var(--mu2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{display:flex;flex-direction:column;gap:4px;padding:14px 12px;border-radius:16px;background:var(--s1)}
+.stat .lbl{font-size:11px;letter-spacing:.12em}
+.stat b{font-family:var(--cond);font-weight:600;font-size:28px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ctrl{display:flex;align-items:center;justify-content:center;gap:28px}
+.play{width:96px;height:96px;border-radius:48px;border:none;background:var(--ac);color:var(--onac);display:flex;align-items:center;justify-content:center}
+.play svg{width:34px;height:34px}
+.ctrl .rb{background:var(--s1);border:none}
+#liveMap{display:none;height:auto;flex:1 1 280px;min-height:240px}
+.mapmode #liveMap{display:block}
+.mapmode .ring{display:none}
+.count{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(12,14,13,.96)}
+.count.on{display:flex}
+.count b{font-family:var(--cond);font-weight:700;font-size:200px;line-height:1;color:var(--ac)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
+.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1) both}
+.check{width:88px;height:88px;border-radius:44px;background:var(--ac);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px var(--hi);align-self:center}
+.check.miss{background:var(--s3);box-shadow:0 0 0 10px var(--s1)}
+.splits{display:flex;flex-direction:column;gap:12px;padding:16px}
+.sp{display:grid;grid-template-columns:58px minmax(0,1fr) 56px;align-items:center;gap:12px;font-size:14px}
+.sp .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.sp .bar i{display:block;height:100%;border-radius:5px;background:#6F766F}
+.sp .bar i.f{background:var(--ac)}
+.sp b{font-family:var(--cond);font-weight:600;font-size:20px;text-align:right;font-variant-numeric:tabular-nums}
+.badges{display:flex;gap:8px}
+.badge{flex:1 1 0;display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;border:1px solid var(--line);background:#141614}
+.badge.g{border-color:var(--hib);background:#141810}
+.badge svg{width:22px;height:22px;flex-shrink:0}
+.badge .t{display:flex;flex-direction:column;min-width:0}
+.badge .t b{font-size:14px}.badge .t span{font-size:12.5px;color:var(--mu)}
+#doneMap{height:170px}
+.two{display:flex;gap:8px}
+.two .stat{flex:1 1 0}
+.two .stat b{font-size:40px;font-weight:700}
+.two .stat small{font-size:18px;color:var(--mu);margin-left:4px;font-family:var(--cond)}
+.chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;height:132px}
+.chart div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart i{display:block;width:100%;border-radius:6px;background:var(--line)}
+.chart i.v{background:#6F766F}.chart i.today{background:var(--ac)}
+.chart span{font-size:11px;font-weight:600;color:var(--mu2);font-variant-numeric:tabular-nums;min-height:13px}
+.chart em{font-style:normal;font-size:12px;font-weight:600;color:var(--mu)}
+.chart em.today{color:var(--ac)}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--mu2)}
+.kv:last-child{border-bottom:none}
+.kv b{font-family:var(--cond);font-weight:600;font-size:20px;color:var(--tx);font-variant-numeric:tabular-nums}
+.rec{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--s1)}
+.rec .ic{width:40px;height:40px;border-radius:20px;background:var(--hi);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rec .ic.miss{background:var(--s3)}
+.rec .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.rec .t b{font-size:15px}.rec .t span{font-size:13px;color:var(--mu)}
+.rec .d{font-family:var(--cond);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.sec{font-size:15px;font-weight:600}
+.sheet{position:fixed;inset:0;z-index:3000;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6)}
+.sheet.on{display:flex}
+.sheet .in{width:100%;max-width:480px;background:var(--s1);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom) + 20px);display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto}
+.sheet h2{margin:0;font-family:var(--cond);font-weight:700;font-size:26px;letter-spacing:.04em;text-transform:uppercase}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:14px;font-weight:600}
+.field input{height:48px;border-radius:12px;border:1.5px solid var(--line2);background:var(--bg);padding:0 14px;font-size:16px}
+.small{font-size:13px;color:var(--mu);line-height:1.45}
+.small a{color:var(--ac)}
+.danger{height:48px;border-radius:12px;border:1.5px solid #5A3218;background:transparent;color:var(--warn);font-weight:600;font-size:15px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 110px);transform:translateX(-50%) translateY(20px);z-index:4000;padding:12px 18px;border-radius:14px;background:#F3F4EF;color:#0C0E0D;font-weight:600;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.you{width:18px;height:18px;border-radius:9px;background:#F3F4EF;border:3px solid #0C0E0D;box-shadow:0 0 0 8px rgba(214,249,75,.22)}
+.pin{width:16px;height:16px;border-radius:8px;border:3px solid #0C0E0D}
+.mk{min-width:26px;height:26px;padding:0 4px;border-radius:13px;background:#0C0E0D;border:2px solid var(--ac);color:var(--tx);font:700 13px/22px var(--cond);text-align:center}
+.spd{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px 14px;gap:8px}
+.spd div{display:flex;flex-direction:column;gap:2px}
+.spd small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.spd b{font-family:var(--cond);font-weight:600;font-size:24px;font-variant-numeric:tabular-nums}
+.spd em{font-style:normal;font-size:14px;color:var(--mu);margin-left:3px}
+.spd .now{color:var(--ac)}
+.gl{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:18px;background:var(--s1)}
+.gl .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.gl .hd .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gl .hd b{font-size:16px}
+.gl .hd span{font-size:13px;color:var(--mu)}
+.gl .x{width:36px;height:36px;border-radius:18px;border:none;background:transparent;color:var(--mu);flex-shrink:0}
+.pbar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:4px;background:var(--ac)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpis div{display:flex;flex-direction:column;gap:2px}
+.kpis small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.kpis b{font-family:var(--cond);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.wo{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.wo .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.wo .t b{font-size:14.5px}.wo .t span{font-size:12.5px;color:var(--mu)}
+.wo button{height:36px;padding:0 14px;border-radius:18px;border:none;background:var(--s3);color:var(--tx);font-weight:600;font-size:13.5px;white-space:nowrap}
+.tip{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:var(--hi);border:1px solid var(--hib);font-size:14px;line-height:1.4;color:#DDE3CC}
+.tip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}
+.pred{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pred div{display:flex;flex-direction:column;gap:2px;padding:12px 10px;border-radius:14px;background:var(--bg)}
+.pred small{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.pred b{font-family:var(--cond);font-weight:600;font-size:21px;font-variant-numeric:tabular-nums}
+.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 16px 16px}
+.ach div{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;background:var(--bg);text-align:center}
+.ach svg{width:26px;height:26px}
+.ach b{font-size:12.5px;line-height:1.2}
+.ach span{font-size:11px;color:var(--mu)}
+.ach .lk{opacity:.35}
+.sel{display:flex;flex-wrap:wrap;gap:8px}
+.sel button{height:40px;padding:0 14px;border-radius:20px;border:1.5px solid var(--line2);background:transparent;font-weight:600;font-size:14px;color:var(--mu2)}
+.sel button[aria-pressed=true]{border-color:var(--ac);color:var(--ac)}
+.f2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wx{text-align:center;margin:-8px 0 0;font-size:13px;color:var(--mu)}
+.wx b{color:var(--mu2);font-weight:600}
+.wx.warn{color:var(--warn)}
+.pacer .best{height:32px;padding:0 10px;border-radius:16px;border:1.5px solid var(--line2);background:transparent;font-size:12.5px;font-weight:600;color:var(--mu2);margin-left:4px;width:auto!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-height:740px){.goal .num{font-size:120px}.opt{padding:9px 0}.screen{gap:12px}}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<section class="screen on" id="s-setup" aria-label="Set goal">
+  <div class="top">
+    <div class="brand"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="10" fill="none" stroke="#262A27" stroke-width="4"/><path d="M13 3a10 10 0 0 1 9.5 13" fill="none" stroke="#D6F94B" stroke-width="4" stroke-linecap="round"/></svg>Goal Miles</div>
+    <div class="row">
+      <button class="ib" id="toGoals" aria-label="Goals and coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></button>
+      <button class="ib" id="toHist" aria-label="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+      <button class="ib" id="toSet" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+    </div>
+  </div>
+  <div class="seg" id="act" role="radiogroup" aria-label="Activity">
+    <button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button>
+  </div>
+  <div class="stepper">
+    <button class="rb" id="dec" aria-label="Decrease goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+    <div class="goal"><span class="num" id="goalNum" aria-live="polite">2</span><span class="lbl" id="goalUnit">miles</span></div>
+    <button class="rb ac" id="inc" aria-label="Increase goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+  <p class="eta" id="eta"></p>
+  <p class="wx" id="wx" hidden></p>
+  <div class="chips" id="chips">
+    <button data-v="0.5">½ mi</button><button data-v="3.1">5K</button><button data-v="6.2">10K</button><button data-v="13.1">Half</button>
+  </div>
+  <div class="card list">
+    <div class="opt"><div class="t"><b>Voice updates</b><span>Miles left + pace every quarter mile</span></div><button class="sw" role="switch" data-k="voice" aria-label="Voice updates"></button></div>
+    <div class="opt"><div class="t"><b>Out &amp; back</b><span>Alert at halfway so you finish at home</span></div><button class="sw" role="switch" data-k="outback" aria-label="Out and back"></button></div>
+    <div class="opt"><div class="t"><b>Pace target</b><span>Tells you if you're ahead or behind</span></div><button class="sw" role="switch" data-k="pacer" aria-label="Pace target"></button></div>
+    <div class="pacer" id="pacerRow"><span class="small">Target pace /mi</span><div class="row"><button id="pDec" aria-label="Faster target">−</button><span class="v" id="pVal">19:00</span><button id="pInc" aria-label="Slower target">+</button><button class="best" id="pBest">Best</button></div></div>
+    <div class="opt"><div class="t"><b>Auto-pause</b><span>Stops the clock when you stop moving</span></div><button class="sw" role="switch" data-k="autop" aria-label="Auto-pause"></button></div>
+  </div>
+  <div class="grow"></div>
+  <div class="pill" id="routePill" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+    <div class="t"><b id="rpName">Route</b><span id="rpMeta"></span></div>
+    <button id="rpClear" aria-label="Remove route"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="cta">
+    <button class="rb" id="toRoute" aria-label="Plan a route"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></button>
+    <button class="btn" id="start"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg><span id="startLbl">Start walk</span></button>
+  </div>
+</section>
+
+<!-- ROUTE -->
+<section class="screen" id="s-route" aria-label="Plan a route">
+  <div class="top">
+    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="title"><b>Plan a route</b><span id="rSub">2 mi walk from your location</span></div>
+    <button class="ib" id="shuffle" aria-label="Suggest new routes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+  </div>
+  <div class="map" id="rMapBox"><div id="rMap" style="height:100%"></div><div class="ov" id="rOv" style="left:12px;top:12px" hidden><b id="rOvD"></b><span class="muted" id="rOvT"></span></div></div>
+  <div class="seg" id="rType" role="radiogroup" aria-label="Route type">
+    <button role="radio" data-v="loop">Loop</button><button role="radio" data-v="out">Out &amp; back</button><button role="radio" data-v="one">One way</button>
+  </div>
+  <div class="routes" id="rList" role="radiogroup" aria-label="Suggested routes"></div>
+  <div class="grow"></div>
+  <a class="btn ghost" id="gmaps" target="_blank" rel="noopener" hidden>Open in Google Maps</a>
+  <button class="btn" id="useRoute" disabled>Use this route</button>
+</section>
+
+<!-- LIVE -->
+<section class="screen" id="s-live" aria-label="Live tracking">
+  <div class="top">
+    <div class="row"><span class="dot" id="lDot"></span><span class="lbl" id="lStatus" style="color:var(--mu2)">Walking</span></div>
+    <div class="row">
+      <span class="chip" id="gps"><i></i><span>GPS</span></span>
+      <button class="ib" id="viewTog" aria-label="Show map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></button>
+    </div>
+  </div>
+  <div class="ring" id="ring">
+    <svg viewBox="0 0 320 320" role="img" id="ringSvg" aria-label="Progress"><circle cx="160" cy="160" r="144" fill="none" stroke="#1E221F" stroke-width="16"/><circle id="prog" cx="160" cy="160" r="144" fill="none" stroke="#D6F94B" stroke-width="16" stroke-linecap="round" stroke-dasharray="904.78" stroke-dashoffset="904.78" transform="rotate(-90 160 160)"/></svg>
+    <div class="c"><span class="lbl" id="lLeftLbl">Miles to go</span><span class="big" id="lLeft" aria-live="off">2.00</span><span class="muted" style="font-size:14px"><b style="color:var(--tx)" id="lDone">0.00</b> of <span id="lGoal">2</span> mi</span></div>
+  </div>
+  <div class="map" id="liveMap"></div>
+  <div class="turn" id="turn"><div class="ar" id="turnIc"></div><div class="t"><b id="turnD"></b><span id="turnT"></span></div></div>
+  <div class="banner" id="bHalf"><svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><div class="t"><b>Halfway. Turn around.</b><span>Head back the way you came to finish at home.</span></div></div>
+  <div class="banner warn" id="bOff"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9A5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div class="t"><b>Off route</b><span>Your miles still count. Check the map to get back on.</span></div></div>
+  <div class="banner gb" id="bGoal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><div class="t"><b>Goal reached</b><span>Keep going, or tap the check to finish.</span></div></div>
+  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="sTime">0:00</b></div><div class="stat"><span class="lbl">Pace</span><b id="sPace">--</b></div><div class="stat"><span class="lbl" id="s3l">Done by</span><b id="s3">--</b></div></div>
+  <div class="card spd" id="spd"><div><small>Now</small><b><span id="vNow" class="now">0.0</span><em>mph</em></b></div><div><small>Avg</small><b><span id="vAvg">0.0</span><em>mph</em></b></div><div><small>Top</small><b><span id="vTop">0.0</span><em>mph</em></b></div></div>
+  <div class="grow"></div>
+  <div class="ctrl">
+    <button class="rb" id="discard" aria-label="Discard workout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <button class="play" id="pause" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="pauseIc"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg></button>
+    <button class="rb" id="finish" aria-label="Finish and save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg></button>
+  </div>
+</section>
+
+<!-- DONE -->
+<section class="screen" id="s-done" aria-label="Workout summary">
+  <div class="top">
+    <button class="ib" data-go="setup" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <span class="lbl" id="dWhen"></span><span style="width:44px"></span>
+  </div>
+  <div class="check pop" id="dCheck"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg></div>
+  <div class="goal" style="gap:2px"><span class="lbl" id="dHead" style="color:var(--ac)">Goal reached</span><span style="font-family:var(--cond);font-weight:700;font-size:92px;line-height:.95;font-variant-numeric:tabular-nums"><span id="dMi">0.00</span><span style="font-size:32px;color:var(--mu);margin-left:6px">mi</span></span></div>
+  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="dTime"></b></div><div class="stat"><span class="lbl">Avg pace</span><b id="dPace"></b></div><div class="stat"><span class="lbl">Goal</span><b id="dGoal"></b></div></div>
+  <div class="card spd" id="dSpd"><div><small>Avg speed</small><b><span id="dAvg"></span><em>mph</em></b></div><div><small>Top speed</small><b><span id="dTop"></span><em>mph</em></b></div><div><small id="dCalL">Calories</small><b id="dCal"></b></div></div>
+  <div class="map" id="doneMap"></div>
+  <div class="card splits" id="dSplitsBox"><div class="row" style="justify-content:space-between"><span class="sec">Splits</span><span class="small">min / mile</span></div><div id="dSplits" style="display:flex;flex-direction:column;gap:12px"></div></div>
+  <div class="badges" id="dBadges"></div>
+  <div class="cta"><button class="rb" id="share" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button><button class="rb" id="gpx" aria-label="Export GPX"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button><button class="btn" data-go="setup">Done</button></div>
+</section>
+
+<!-- HISTORY -->
+<section class="screen" id="s-hist" aria-label="History">
+  <div class="top">
+    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="title"><b>History</b></div><span style="width:44px"></span>
+  </div>
+  <div class="two"><div class="stat"><span class="lbl">This week</span><b><span id="hWeek">0.0</span><small>mi</small></b></div><div class="stat"><span class="lbl">Streak</span><b style="color:var(--warn)"><span id="hStreak">0</span><small id="hStreakU">days</small></b></div></div>
+  <div class="seg" id="hFilt" role="radiogroup" aria-label="Activity filter"><button role="radio" data-v="all">All</button><button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button></div>
+  <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="row" style="justify-content:space-between"><span class="sec">Last 7 days</span><span class="small" id="hGoals"></span></div><div class="chart" id="hChart" role="img"></div></div>
+  <div class="card list"><div class="sec" style="padding:12px 0 2px">Personal bests</div><div id="hBests"></div></div>
+  <div class="card"><div class="row" style="justify-content:space-between;padding:14px 16px 10px"><span class="sec">Achievements</span><span class="small" id="hAchN"></span></div><div class="ach" id="hAch"></div></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><span class="sec">Recent</span><div id="hRecent" style="display:flex;flex-direction:column;gap:8px"></div></div>
+</section>
+
+<!-- GOALS -->
+<section class="screen" id="s-goals" aria-label="Goals and coach">
+  <div class="top">
+    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="title"><b>Goals &amp; coach</b><span id="gSub">Built from your own workouts</span></div>
+    <button class="ib" id="addGoal" aria-label="Add a goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+  <div class="seg" id="gAct" role="radiogroup" aria-label="Activity"><button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button></div>
+  <div id="gTip"></div>
+  <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="row" style="justify-content:space-between"><span class="sec">Predicted times</span><span class="small" id="gPredNote"></span></div><div class="pred" id="gPred"></div></div>
+  <div id="gList" style="display:flex;flex-direction:column;gap:10px"></div>
+</section>
+
+<div class="sheet" id="goalSheet" role="dialog" aria-modal="true" aria-labelledby="gsH">
+  <div class="in">
+    <div class="row" style="justify-content:space-between"><h2 id="gsH">New goal</h2><button class="ib" id="gsClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="field"><label>Goal type</label><div class="sel" id="gsType"><button data-v="race">Race time</button><button data-v="mile">Fastest mile</button><button data-v="week">Weekly miles</button><button data-v="month">Monthly miles</button><button data-v="streak">Streak</button></div></div>
+    <div class="field"><label>Activity</label><div class="sel" id="gsAct"><button data-v="walk">Walk</button><button data-v="run">Run</button><button data-v="bike">Bike</button></div></div>
+    <div class="field" id="gsDistF"><label>Distance</label><div class="sel" id="gsDist"><button data-v="1">1 mi</button><button data-v="3.1">5K</button><button data-v="6.2">10K</button><button data-v="13.1">Half</button><button data-v="26.2">Marathon</button></div></div>
+    <div class="f2" id="gsTimeF"><div class="field"><label for="gsMin">Target minutes</label><input id="gsMin" inputmode="numeric" placeholder="30"></div><div class="field"><label for="gsSec">Seconds</label><input id="gsSec" inputmode="numeric" placeholder="00"></div></div>
+    <div class="field" id="gsNF"><label for="gsN" id="gsNL">Miles</label><input id="gsN" inputmode="decimal" placeholder="15"></div>
+    <div class="field" id="gsByF"><label for="gsBy">By date (optional)</label><input id="gsBy" type="date"></div>
+    <button class="btn" id="gsSave">Add goal</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="setH">
+  <div class="in">
+    <div class="row" style="justify-content:space-between"><h2 id="setH">Settings</h2><button class="ib" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="field"><label for="orsKey">Route planner key (OpenRouteService)</label><input id="orsKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your free key"><p class="small" style="margin:0">Free at <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a>. Sign up, open Dashboard, copy the "Basic" key, paste it here. Stays on this phone.</p></div>
+    <div class="field"><label for="wt">Your weight in lb (optional)</label><input id="wt" inputmode="numeric" placeholder="For calorie estimates"></div>
+    <div class="opt" style="border-top:1px solid var(--line)"><div class="t"><b>Demo mode</b><span>Fake GPS so you can try it from the couch</span></div><button class="sw" role="switch" id="demoSw" aria-label="Demo mode"></button></div>
+    <p class="small" style="margin:0"><b style="color:var(--tx)">Keep the screen on while you go.</b> iPhone pauses GPS for web apps when the screen locks. Goal Miles keeps the screen awake, and if you do lock it, it estimates the gap in a straight line when you come back.</p>
+    <button class="danger" id="clearHist">Clear all history</button>
+  </div>
+</div>
+
+<div class="count" id="count" aria-live="assertive"><b id="countN">3</b><span class="lbl" id="countMsg">Finding GPS…</span></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const M = 1609.344;
+const AC = '#D6F94B';
+const LABEL = { walk: 'walk', run: 'run', bike: 'ride' };
+const VERB = { walk: 'Walking', run: 'Running', bike: 'Riding' };
+const MAXV = { walk: 4, run: 9, bike: 22 };
+const DEMOV = { walk: 1.45, run: 2.9, bike: 6.5 }, FF = 8;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('gm_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('gm_' + k, JSON.stringify(v)); } catch {} }
+};
+const S = Object.assign({ act: 'walk', goal: 2, voice: true, outback: false, pacer: false, autop: true, pace: { walk: 1140, run: 570, bike: 240 }, key: '', demo: false }, store.get('settings', {}));
+const save = () => store.set('settings', S);
+let hist = store.get('hist', []);
+let route = null, rType = 'loop', rOpts = [], rPick = 0, rSeed = 0;
+
+/* ---------- utils ---------- */
+const fmtG = g => Number.isInteger(g) ? String(g) : (+g.toFixed(1)).toString();
+const mmss = t => { t = Math.max(0, Math.round(t)); const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; return h ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') : m + ':' + String(s).padStart(2, '0'); };
+const pace = (sec, mi) => mi > 0.02 ? mmss(sec / mi) : '--';
+const clock = d => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const rad = x => x * Math.PI / 180;
+function hav(a, b) { const R = 6371000, dLa = rad(b[0] - a[0]), dLo = rad(b[1] - a[1]); const h = Math.sin(dLa / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+function dest(p, brg, d) { const R = 6371000, b = rad(brg), la = rad(p[0]), lo = rad(p[1]), ad = d / R; const la2 = Math.asin(Math.sin(la) * Math.cos(ad) + Math.cos(la) * Math.sin(ad) * Math.cos(b)); const lo2 = lo + Math.atan2(Math.sin(b) * Math.sin(ad) * Math.cos(la), Math.cos(ad) - Math.sin(la) * Math.sin(la2)); return [la2 * 180 / Math.PI, lo2 * 180 / Math.PI]; }
+function bearing(a, b) { const y = Math.sin(rad(b[1] - a[1])) * Math.cos(rad(b[0])), x = Math.cos(rad(a[0])) * Math.sin(rad(b[0])) - Math.sin(rad(a[0])) * Math.cos(rad(b[0])) * Math.cos(rad(b[1] - a[1])); return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360; }
+const compass = b => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'][Math.round(b / 45) % 8];
+function toast(t, ms = 2600) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms); }
+const feet = m => m < 160 ? Math.max(10, Math.round(m * 3.28084 / 10) * 10) + ' ft' : (m / M).toFixed(1) + ' mi';
+
+/* ---------- audio / voice ---------- */
+let actx = null;
+function primeAudio() {
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch {}
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch {}
+}
+function chime(n = 2) {
+  if (!actx) return; const t0 = actx.currentTime;
+  [880, 1318.5, 1760].slice(0, n).forEach((f, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t0 + i * .14); g.gain.linearRampToValueAtTime(.25, t0 + i * .14 + .02); g.gain.exponentialRampToValueAtTime(.001, t0 + i * .14 + .5); o.connect(g).connect(actx.destination); o.start(t0 + i * .14); o.stop(t0 + i * .14 + .55); });
+  try { navigator.vibrate && navigator.vibrate([120, 80, 120]); } catch {}
+}
+function say(t) { if (!S.voice || !window.speechSynthesis) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.rate = 1.02; speechSynthesis.speak(u); } catch {} }
+const spokenMi = mi => { const r = Math.round(mi * 100) / 100; return (r % 1 === 0 ? r.toFixed(0) : r.toFixed(2).replace(/0$/, '')) + (r === 1 ? ' mile' : ' miles'); };
+const spokenT = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ' hour' + (h > 1 ? 's ' : ' ') : '') + (m ? m + ' minute' + (m > 1 ? 's ' : ' ') : '') + (!h && x ? x + ' seconds' : ''); };
+
+/* ---------- navigation ---------- */
+let cur = 'setup';
+function go(s) {
+  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-' + s)); cur = s;
+  if (s === 'setup') renderSetup();
+  if (s === 'route') openRoute();
+  if (s === 'hist') renderHist();
+  if (s === 'goals') renderGoals();
+  window.scrollTo(0, 0);
+}
+$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+
+/* ---------- setup ---------- */
+function renderSetup() {
+  $$('#act button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === S.act));
+  $('#goalNum').textContent = fmtG(S.goal);
+  $('#goalUnit').textContent = S.goal === 1 ? 'mile' : 'miles';
+  const mins = Math.round(S.goal * S.pace[S.act] / 60);
+  $('#eta').innerHTML = 'Est. <b>' + (mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min') + '</b> at ' + mmss(S.pace[S.act]) + ' /mi';
+  $$('#chips button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === S.goal));
+  $$('.sw[data-k]').forEach(b => b.setAttribute('aria-checked', !!S[b.dataset.k]));
+  $('#pacerRow').classList.toggle('on', S.pacer);
+  $('#pVal').textContent = mmss(S.pace[S.act]);
+  $('#startLbl').textContent = 'Start ' + LABEL[S.act];
+  if (typeof renderWx === 'function') renderWx();
+  const ok = route && route.act === S.act && Math.abs(route.goal - S.goal) < 0.001;
+  if (route && !ok) route = null;
+  $('#routePill').hidden = !route;
+  if (route) { $('#rpName').textContent = route.name; $('#rpMeta').textContent = (route.m / M).toFixed(2) + ' mi · ' + route.typeLabel; }
+}
+$$('#act button').forEach(b => b.onclick = () => { S.act = b.dataset.v; save(); renderSetup(); });
+$('#dec').onclick = () => { S.goal = S.goal <= 1 ? 0.5 : Math.ceil(S.goal) - 1; save(); renderSetup(); };
+$('#inc').onclick = () => { S.goal = S.goal < 1 ? 1 : Math.min(100, Math.floor(S.goal) + 1); save(); renderSetup(); };
+$$('#chips button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderSetup(); });
+$$('.sw[data-k]').forEach(b => b.onclick = () => { S[b.dataset.k] = !S[b.dataset.k]; save(); renderSetup(); });
+$('#pDec').onclick = () => { S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
+$('#pInc').onclick = () => { S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
+$('#rpClear').onclick = () => { route = null; renderSetup(); };
+$('#toRoute').onclick = () => go('route');
+$('#toHist').onclick = () => go('hist');
+$('#toGoals').onclick = () => go('goals');
+$('#pBest').onclick = () => { const b = bestPaceFor(S.act, S.goal); if (!b) return toast('No past ' + LABEL[S.act] + 's near this distance yet'); S.pace[S.act] = Math.round(b); S.pacer = true; save(); renderSetup(); toast('Racing your best: ' + mmss(b) + ' /mi'); };
+
+/* ---------- settings ---------- */
+function openSettings() { $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
+function closeSettings() { S.wt = parseFloat($('#wt').value) || 0; S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); }
+$('#toSet').onclick = openSettings;
+$('#setClose').onclick = closeSettings;
+$('#settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
+$('#demoSw').onclick = () => { S.demo = !S.demo; save(); $('#demoSw').setAttribute('aria-checked', S.demo); toast(S.demo ? 'Demo mode on: fake GPS' : 'Demo mode off: real GPS'); };
+$('#clearHist').onclick = () => { if (!$('#clearHist').dataset.arm) { $('#clearHist').dataset.arm = 1; $('#clearHist').textContent = 'Tap again to delete everything'; setTimeout(() => { delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; }, 3000); return; } hist = []; store.set('hist', hist); toast('History cleared'); delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; };
+
+/* ---------- maps ---------- */
+const TILE = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+function mkMap(el, inter = true) {
+  const m = L.map(el, { zoomControl: false, attributionControl: true, dragging: inter, touchZoom: inter, scrollWheelZoom: inter, doubleClickZoom: inter, boxZoom: false, keyboard: false });
+  L.tileLayer(TILE, { attribution: ATTR, maxZoom: 19 }).addTo(m);
+  m.attributionControl.setPrefix(false);
+  return m;
+}
+const youIcon = () => L.divIcon({ className: '', html: '<div class="you"></div>', iconSize: [18, 18] });
+const pinIcon = c => L.divIcon({ className: '', html: '<div class="pin" style="background:' + c + '"></div>', iconSize: [16, 16] });
+const mkIcon = t => L.divIcon({ className: '', html: '<div class="mk">' + t + '</div>', iconSize: [26, 26] });
+
+/* ---------- location ---------- */
+let lastFix = null;
+function locate() {
+  return new Promise((res, rej) => {
+    if (S.demo) { lastFix = lastFix || [27.7128, -97.3248]; return res(lastFix); }
+    if (!navigator.geolocation) return rej(new Error('No GPS on this device'));
+    navigator.geolocation.getCurrentPosition(p => { lastFix = [p.coords.latitude, p.coords.longitude]; store.set('lastLoc', lastFix); res(lastFix); }, e => rej(new Error(e.code === 1 ? 'Location is off for this app. Turn it on in Settings › Privacy › Location Services › Safari Websites.' : 'Could not get your location. Try again outside.')), { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  });
+}
+
+/* ---------- route planner ---------- */
+let rMap = null, rLayers = [];
+function openRoute() {
+  $('#rSub').textContent = fmtG(S.goal) + ' mi ' + LABEL[S.act] + ' from your location';
+  $$('#rType button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === rType));
+  if (!rMap) rMap = mkMap('rMap');
+  setTimeout(() => rMap.invalidateSize(), 50);
+  if (!S.key) {
+    $('#rList').innerHTML = '<div class="msg"><b>One-time setup.</b> Route planning uses OpenRouteService, which is free. Add your key in Settings and you\'re set.<br><button class="btn ghost" id="rKeyBtn" style="width:100%">Add key</button></div>';
+    $('#rKeyBtn').onclick = openSettings; $('#useRoute').disabled = true; $('#gmaps').hidden = true;
+    locate().then(p => rMap.setView(p, 15)).catch(() => rMap.setView([27.7128, -97.3248], 13));
+    return;
+  }
+  if (!rOpts.length || rOpts.goal !== S.goal || rOpts.act !== S.act || rOpts.type !== rType) genRoutes(); else drawRoutes();
+}
+$$('#rType button').forEach(b => b.onclick = () => { rType = b.dataset.v; rSeed = 0; $$('#rType button').forEach(x => x.setAttribute('aria-checked', x === b)); genRoutes(); });
+$('#shuffle').onclick = () => { if (!S.key) return openSettings(); rSeed += 3; genRoutes(); };
+
+async function ors(start, end, len, seed) {
+  const prof = S.act === 'bike' ? 'cycling-regular' : 'foot-walking';
+  const body = { coordinates: end ? [[start[1], start[0]], [end[1], end[0]]] : [[start[1], start[0]]], instructions: true, units: 'm', preference: 'recommended' };
+  if (!end) body.options = { round_trip: { length: Math.round(len), points: 4, seed } };
+  const r = await fetch('https://api.openrouteservice.org/v2/directions/' + prof + '/geojson', { method: 'POST', headers: { 'Authorization': S.key, 'Content-Type': 'application/json', 'Accept': 'application/geo+json, application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) { let m = 'Route service error ' + r.status; if (r.status === 401 || r.status === 403) m = 'That route key didn\'t work. Check it in Settings.'; if (r.status === 429) m = 'Too many route requests. Wait a minute.'; const e = new Error(m); e.fatal = r.status < 500; throw e; }
+  const f = (await r.json()).features[0];
+  const coords = f.geometry.coordinates.map(c => [c[1], c[0]]);
+  const steps = f.properties.segments.flatMap(s => s.steps).map(s => ({ i: s.way_points[0], text: s.instruction, type: s.type }));
+  return { coords, steps, m: f.properties.summary.distance };
+}
+function finishRoute(r, type, start) {
+  const cum = [0]; for (let i = 1; i < r.coords.length; i++) cum.push(cum[i - 1] + hav(r.coords[i - 1], r.coords[i]));
+  r.cum = cum; r.m = cum[cum.length - 1];
+  let far = 0, fp = r.coords[0]; r.coords.forEach(c => { const d = hav(start, c); if (d > far) { far = d; fp = c; } });
+  const dir = compass(bearing(start, fp));
+  r.type = type; r.typeLabel = { loop: 'Loop', out: 'Out & back', one: 'One way' }[type];
+  r.name = dir + ' ' + { loop: 'loop', out: 'and back', one: 'route' }[type];
+  r.turns = r.steps.filter(s => [0, 1, 2, 3, 7, 9].includes(s.type)).length;
+  r.act = S.act; r.goal = S.goal; r.start = start;
+  return r;
+}
+async function makeLoop(start, target, seed) {
+  let r = await ors(start, null, target, seed);
+  if (Math.abs(r.m - target) / target > 0.06) { const r2 = await ors(start, null, target * target / r.m, seed); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
+  return finishRoute(r, 'loop', start);
+}
+async function makeLine(start, target, brg, type) {
+  let d = target * 0.7, r = await ors(start, dest(start, brg, d));
+  if (Math.abs(r.m - target) / target > 0.05) { d *= target / r.m; const r2 = await ors(start, dest(start, brg, d)); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
+  if (type === 'out') {
+    const n = r.coords.length;
+    r.outIdx = n - 1;
+    r.coords = r.coords.concat(r.coords.slice(0, -1).reverse());
+    r.steps = r.steps.filter(s => s.type !== 10).concat([{ i: n - 1, text: 'Turn around and head back', type: 9 }, { i: r.coords.length - 1, text: 'Arrive back at the start', type: 10 }]);
+  }
+  return finishRoute(r, type, start);
+}
+async function genRoutes() {
+  const box = $('#rList');
+  box.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  $('#useRoute').disabled = true; $('#gmaps').hidden = true; $('#rOv').hidden = true;
+  rLayers.forEach(l => rMap.removeLayer(l)); rLayers = [];
+  let start;
+  try { start = await locate(); } catch (e) { box.innerHTML = '<div class="msg">' + e.message + '</div>'; return; }
+  rMap.setView(start, 15);
+  const target = S.goal * M, base = (rSeed * 47) % 360, jobs = [];
+  for (let i = 0; i < 3; i++) {
+    if (rType === 'loop') jobs.push(makeLoop(start, target, rSeed + i + 1));
+    else jobs.push(makeLine(start, rType === 'out' ? target / 2 : target, base + i * 120, rType));
+  }
+  const res = await Promise.allSettled(jobs);
+  rOpts = res.filter(x => x.status === 'fulfilled').map(x => x.value);
+  Object.assign(rOpts, { goal: S.goal, act: S.act, type: rType });
+  if (!rOpts.length) { const e = res.find(x => x.status === 'rejected'); box.innerHTML = '<div class="msg"><b>Couldn\'t build routes.</b> ' + (e ? e.reason.message : '') + '</div>'; return; }
+  rOpts.sort((a, b) => Math.abs(a.m - target) - Math.abs(b.m - target));
+  rPick = 0; drawRoutes();
+}
+function drawRoutes() {
+  const box = $('#rList'); box.innerHTML = '';
+  rLayers.forEach(l => rMap.removeLayer(l)); rLayers = [];
+  rOpts.forEach((r, i) => {
+    const b = document.createElement('button');
+    b.className = 'rt'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', i === rPick);
+    const mins = Math.round(r.m / M * S.pace[S.act] / 60);
+    b.innerHTML = '<div class="t"><b>' + r.name + '</b><span>' + r.turns + ' turns · ~' + mins + ' min</span></div><span class="d">' + (r.m / M).toFixed(2) + ' mi</span>';
+    b.onclick = () => { rPick = i; drawRoutes(); };
+    box.appendChild(b);
+  });
+  rOpts.forEach((r, i) => { if (i !== rPick) rLayers.push(L.polyline(r.coords, { color: '#5A615B', weight: 4, opacity: .8 }).addTo(rMap)); });
+  const r = rOpts[rPick];
+  rLayers.push(L.polyline(r.coords, { color: AC, weight: 12, opacity: .22 }).addTo(rMap));
+  rLayers.push(L.polyline(r.coords, { color: AC, weight: 5 }).addTo(rMap));
+  for (let k = 1; k * M < r.m - 80; k++) { const j = r.cum.findIndex(c => c >= k * M); if (j > 0) rLayers.push(L.marker(r.coords[j], { icon: mkIcon(k), interactive: false }).addTo(rMap)); }
+  if (r.type !== 'loop') rLayers.push(L.marker(r.type === 'out' ? r.coords[r.outIdx] : r.coords[r.coords.length - 1], { icon: pinIcon('#FF9A5C'), interactive: false }).addTo(rMap));
+  rLayers.push(L.marker(r.start, { icon: youIcon(), interactive: false }).addTo(rMap));
+  rMap.fitBounds(L.latLngBounds(r.coords), { padding: [28, 28] });
+  $('#rOv').hidden = false; $('#rOvD').textContent = (r.m / M).toFixed(2) + ' mi'; $('#rOvT').textContent = '~' + Math.round(r.m / M * S.pace[S.act] / 60) + ' min';
+  $('#useRoute').disabled = false;
+  const g = $('#gmaps'), at = f => r.coords[Math.round(f * (r.coords.length - 1))].map(x => x.toFixed(6)).join(',');
+  const o = r.start.map(x => x.toFixed(6)).join(','), wps = r.type === 'one' ? [at(.33), at(.66)] : r.type === 'out' ? [at(.25)] : [at(.25), at(.5), at(.75)];
+  const dst = r.type === 'one' ? at(1) : r.type === 'out' ? r.coords[r.outIdx].map(x => x.toFixed(6)).join(',') : o;
+  g.href = 'https://www.google.com/maps/dir/?api=1&origin=' + o + '&destination=' + dst + '&waypoints=' + encodeURIComponent(wps.join('|')) + '&travelmode=' + (S.act === 'bike' ? 'bicycling' : 'walking');
+  g.hidden = false;
+}
+$('#useRoute').onclick = () => { route = rOpts[rPick]; if (route.type === 'out') S.outback = true; save(); go('setup'); toast('Route set. Hit start when you\'re ready.'); };
+
+/* ---------- tracking ---------- */
+let T = null, watchId = null, ticker = null, demoTimer = null, wake = null, lMap = null, lLayers = {};
+const RC = 904.78;
+
+async function keepAwake() { try { if ('wakeLock' in navigator) { wake = await navigator.wakeLock.request('screen'); } } catch {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && T && !T.done) keepAwake(); });
+
+function newSession() {
+  return { act: S.act, goal: S.goal, start: Date.now(), mi: 0, active: 0, lastTick: Date.now(), paused: false, auto: false, last: null, lastMove: Date.now(), trail: [], splits: [], nextSplit: 1, nextQ: 0.25, half: false, goalHit: false, route, ri: 0, spoke: -1, offN: 0, acc: null, outback: S.outback || (route && route.type === 'out'), pacer: S.pacer, target: S.pace[S.act], autop: S.autop, sb: [], vNow: 0, vTop: 0 };
+}
+$('#start').onclick = () => {
+  primeAudio(); T = newSession(); showLive(); keepAwake(); startGPS();
+  let n = 3; const c = $('#count'); c.classList.add('on'); $('#countN').textContent = n; $('#countMsg').textContent = S.demo ? 'Demo mode' : 'Finding GPS…';
+  const iv = setInterval(() => { n--; if (n > 0) { $('#countN').textContent = n; chime(1); } else { clearInterval(iv); c.classList.remove('on'); T.start = T.lastTick = T.lastMove = Date.now(); T.running = true; chime(2); say("Let's go. " + spokenMi(T.goal) + '.'); } }, 900);
+  chime(1);
+};
+function showLive() {
+  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-live')); cur = 'live';
+  $('#lGoal').textContent = fmtG(T.goal);
+  $('#s-live').classList.toggle('mapmode', !!T.route && !!T.mapMode);
+  $('#turn').classList.toggle('on', !!T.route);
+  ['bHalf', 'bOff', 'bGoal'].forEach(id => $('#' + id).classList.remove('on'));
+  if (!ticker) ticker = setInterval(tick, 1000);
+  tick();
+}
+function startGPS() {
+  stopGPS();
+  if (S.demo) {
+    let p = T.route ? T.route.coords[0].slice() : (lastFix || [27.7128, -97.3248]).slice(), idx = 0, brg = Math.random() * 360;
+    demoTimer = setInterval(() => {
+      if (!T || !T.running) return;
+      T.dclock = (T.dclock || Date.now()) + 1000 * FF;
+      if (T.paused) { onFix({ coords: { latitude: p[0], longitude: p[1], accuracy: 6 }, timestamp: T.dclock }); return; }
+      let step = DEMOV[T.act] * FF * (0.85 + Math.random() * 0.3);
+      if (T.route) { while (step > 0 && idx < T.route.coords.length - 1) { const nx = T.route.coords[idx + 1], d = hav(p, nx); if (d <= step) { p = nx.slice(); idx++; step -= d; } else { const f = step / d; p = [p[0] + (nx[0] - p[0]) * f, p[1] + (nx[1] - p[1]) * f]; step = 0; } } if (idx >= T.route.coords.length - 1) p = dest(p, brg, step || 10); }
+      else { brg += (Math.random() - .5) * 20; p = dest(p, brg, step); }
+      onFix({ coords: { latitude: p[0] + (Math.random() - .5) * 2e-5, longitude: p[1] + (Math.random() - .5) * 2e-5, accuracy: 5 + Math.random() * 6 }, timestamp: T.dclock });
+    }, 1000);
+    return;
+  }
+  if (!navigator.geolocation) { toast('This device has no GPS'); return; }
+  watchId = navigator.geolocation.watchPosition(onFix, e => { if (e.code === 1) toast('Location is off. Turn on Location Services for Safari Websites.', 5000); }, { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 });
+}
+function stopGPS() { if (watchId != null) navigator.geolocation.clearWatch(watchId); watchId = null; clearInterval(demoTimer); demoTimer = null; }
+
+function onFix(p) {
+  if (!T || T.done) return;
+  const acc = p.coords.accuracy, pt = [p.coords.latitude, p.coords.longitude], t = p.timestamp || Date.now();
+  T.acc = acc; lastFix = pt; gpsChip();
+  if (!T.running || acc > 35) return;
+  if (!T.last) { T.last = { p: pt, t }; T.trail.push(pt); return; }
+  const d = hav(T.last.p, pt), dt = (t - T.last.t) / 1000;
+  if (dt <= 0) return;
+  if (d / dt > MAXV[T.act] * 1.6 && dt < 30) { T.last = { p: pt, t }; return; }
+  if (d < Math.max(3, acc * 0.3)) return;
+  T.last = { p: pt, t };
+  if (T.paused) return;
+  T.lastMove = Date.now();
+  if (T.auto) { T.auto = false; T.lastTick = Date.now(); }
+  T.mi += d / M; T.trail.push(pt);
+  T.sb.push([t, T.mi]); while (T.sb.length > 2 && t - T.sb[0][0] > 12000) T.sb.shift();
+  if (T.sb.length > 1) { const a = T.sb[0], b = T.sb[T.sb.length - 1], h = (b[0] - a[0]) / 3600000; if (h > 0) { T.vNow = (b[1] - a[1]) / h; if (b[0] - a[0] > 6000 && T.vNow < MAXV[T.act] * 2.237) T.vTop = Math.max(T.vTop, T.vNow); } }
+  if (T.route) followRoute(pt);
+  checkCues();
+  render();
+}
+function followRoute(pt) {
+  const r = T.route; let best = 1e9, bi = T.ri;
+  for (let i = Math.max(0, T.ri - 5); i < Math.min(r.coords.length, T.ri + 80); i++) { const d = hav(pt, r.coords[i]); if (d < best) { best = d; bi = i; } }
+  if (best < 45) { T.ri = Math.max(T.ri, bi); T.offN = 0; $('#bOff').classList.remove('on'); }
+  else if (++T.offN >= 3) { if (!$('#bOff').classList.contains('on')) { $('#bOff').classList.add('on'); say('Off route.'); } }
+  const nx = r.steps.find(s => s.i > T.ri && s.type !== 11);
+  if (!nx) return;
+  const dm = r.cum[nx.i] - r.cum[T.ri];
+  if (dm < 35 && T.spoke !== nx.i) { T.spoke = nx.i; say(nx.text); chime(1); }
+}
+function checkCues() {
+  while (T.mi >= T.nextSplit) {
+    const sp = T.active - T.splits.reduce((a, b) => a + b, 0); T.splits.push(sp);
+    if (T.mi < T.goal) say('Mile ' + T.nextSplit + '. Split ' + spokenT(sp) + '.');
+    T.nextSplit++;
+  }
+  if (T.mi >= T.nextQ && T.mi < T.goal - 0.05) {
+    let msg = spokenMi(T.goal - T.mi) + ' to go. Pace ' + spokenT(T.active / T.mi) + '.';
+    if (T.pacer) { const diff = T.mi * T.target - T.active; msg += Math.abs(diff) < 10 ? ' Right on pace.' : ' ' + spokenT(Math.abs(diff)) + (diff > 0 ? ' ahead.' : ' behind.'); }
+    if (T.nextQ % 1 !== 0 || T.mi > T.goal - 1) say(msg);
+    while (T.nextQ <= T.mi) T.nextQ += 0.25;
+  }
+  if (T.outback && !T.half && T.mi >= T.goal / 2) { T.half = true; $('#bHalf').classList.add('on'); chime(3); say('Halfway. Turn around and head back.'); setTimeout(() => $('#bHalf').classList.remove('on'), 45000); }
+  if (!T.goalHit && T.mi >= T.goal) { T.goalHit = true; $('#bGoal').classList.add('on'); $('#bHalf').classList.remove('on'); chime(3); say('Goal reached! ' + spokenMi(T.goal) + ' in ' + spokenT(T.active) + '. Nice work.'); }
+}
+function tick() {
+  if (!T || T.done) return;
+  const now = Date.now();
+  if (T.running && !T.paused && !T.auto) T.active += (now - T.lastTick) / 1000 * (S.demo ? FF : 1);
+  T.lastTick = now;
+  if (T.running && T.autop && !T.paused && !T.auto && now - T.lastMove > (S.demo ? 3000 : 8000) && T.mi > 0.01) { T.auto = true; T.active = Math.max(0, T.active - 8); }
+  if (now % 5000 < 1000) store.set('live', T);
+  render();
+}
+function gpsChip() {
+  const c = $('#gps'), a = T && T.acc;
+  c.className = 'chip ' + (a == null ? '' : a <= 15 ? 'good' : a <= 35 ? 'ok' : 'bad');
+  c.lastElementChild.textContent = S.demo ? 'Demo GPS' : a == null ? 'Finding GPS' : a <= 15 ? 'GPS strong' : a <= 35 ? 'GPS okay' : 'GPS weak';
+}
+function render() {
+  if (!T || cur !== 'live') return;
+  const left = Math.max(0, T.goal - T.mi), pct = Math.min(1, T.mi / T.goal);
+  $('#prog').setAttribute('stroke-dashoffset', RC * (1 - pct));
+  $('#ringSvg').setAttribute('aria-label', Math.round(pct * 100) + ' percent of goal');
+  $('#lLeft').textContent = T.goalHit ? T.mi.toFixed(2) : left.toFixed(2);
+  $('#lLeftLbl').textContent = T.goalHit ? 'Total miles' : 'Miles to go';
+  $('#lDone').textContent = T.mi.toFixed(2);
+  const st = !T.running ? 'Get ready' : T.paused ? 'Paused' : T.auto ? 'Auto-paused' : T.goalHit ? 'Goal reached' : VERB[T.act];
+  $('#lStatus').textContent = st; $('#lDot').className = 'dot' + (T.paused || T.auto ? ' p' : '');
+  $('#sTime').textContent = mmss(T.active);
+  $('#sPace').textContent = pace(T.active, T.mi);
+  if (T.pacer) { const diff = T.mi * T.target - T.active; $('#s3l').textContent = diff >= 0 ? 'Ahead' : 'Behind'; $('#s3').textContent = T.mi > 0.02 ? mmss(Math.abs(diff)) : '--'; $('#s3').style.color = diff >= 0 ? AC : 'var(--warn)'; }
+  else { $('#s3l').textContent = 'Done by'; $('#s3').style.color = ''; $('#s3').textContent = T.goalHit ? 'Done' : T.mi > 0.05 ? clock(new Date(Date.now() + left * T.active / T.mi * 1000)).replace(/\s?[AP]M/i, '') : '--'; }
+  const stale = !T.last || Date.now() - T.lastMove > 8000 || T.paused;
+  $('#vNow').textContent = (stale ? 0 : T.vNow).toFixed(1);
+  $('#vAvg').textContent = (T.active > 5 ? T.mi / (T.active / 3600) : 0).toFixed(1);
+  $('#vTop').textContent = T.vTop.toFixed(1);
+  const pi = $('#pauseIc');
+  pi.innerHTML = T.paused ? '<path d="M8 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 8 4.5z"/>' : '<rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/>';
+  $('#pause').setAttribute('aria-label', T.paused ? 'Resume' : 'Pause');
+  if (T.route) {
+    const r = T.route, nx = r.steps.find(s => s.i > T.ri && s.type !== 11);
+    if (nx) { $('#turnD').textContent = feet(r.cum[nx.i] - r.cum[T.ri]); $('#turnT').textContent = nx.text; $('#turnIc').innerHTML = arrow(nx.type); }
+    else { $('#turnD').textContent = 'Finish'; $('#turnT').textContent = 'Keep going to hit your goal'; $('#turnIc').innerHTML = arrow(10); }
+  }
+  if (T.mapMode) drawLive();
+}
+function arrow(t) {
+  const P = { 0: 'M18 18v-6a3 3 0 0 0-3-3H6M10 5 6 9l4 4', 1: 'M6 18v-6a3 3 0 0 1 3-3h9M14 5l4 4-4 4', 2: 'M17 19V9H7M11 5 7 9l4 4', 3: 'M7 19V9h10M13 5l4 4-4 4', 4: 'M15 19v-7L8 5M8 11V5h6', 5: 'M9 19v-7l7-7M16 11V5h-6', 12: 'M15 19v-7L8 5M8 11V5h6', 13: 'M9 19v-7l7-7M16 11V5h-6', 9: 'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11', 10: 'M5 21V4M5 4h12l-2 4 2 4H5' };
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="' + AC + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (P[t] || 'M12 19V5M6 11l6-6 6 6') + '"/></svg>';
+}
+function drawLive() {
+  if (!lMap) { lMap = mkMap('liveMap'); }
+  setTimeout(() => lMap.invalidateSize(), 30);
+  if (T.route && !lLayers.route) { lLayers.route = L.polyline(T.route.coords, { color: '#5A615B', weight: 5 }).addTo(lMap); }
+  if (!lLayers.trail) lLayers.trail = L.polyline([], { color: AC, weight: 5 }).addTo(lMap);
+  lLayers.trail.setLatLngs(T.trail);
+  const p = T.last ? T.last.p : (T.route ? T.route.coords[0] : lastFix);
+  if (!p) return;
+  if (!lLayers.you) lLayers.you = L.marker(p, { icon: youIcon(), interactive: false }).addTo(lMap); else lLayers.you.setLatLng(p);
+  lMap.setView(p, Math.max(lMap.getZoom() || 0, 16), { animate: false });
+}
+$('#viewTog').onclick = () => { if (!T) return; T.mapMode = !T.mapMode; $('#s-live').classList.toggle('mapmode', T.mapMode); $('#viewTog').setAttribute('aria-label', T.mapMode ? 'Show progress ring' : 'Show map'); render(); };
+$('#pause').onclick = () => { if (!T || !T.running) return; T.paused = !T.paused; T.auto = false; T.lastTick = Date.now(); T.lastMove = Date.now(); say(T.paused ? 'Paused.' : 'Resumed.'); render(); };
+$('#discard').onclick = () => {
+  const b = $('#discard');
+  if (!b.dataset.arm) { b.dataset.arm = 1; toast('Tap X again to discard this workout'); setTimeout(() => delete b.dataset.arm, 3000); return; }
+  endSession(); go('setup');
+};
+$('#finish').onclick = () => {
+  if (!T) return;
+  if (T.mi < 0.01) { toast('Nothing to save yet. Tap X to cancel.'); return; }
+  const rec = { id: Date.now(), date: T.start, act: T.act, goal: T.goal, mi: +T.mi.toFixed(3), secs: Math.round(T.active), splits: T.splits.map(Math.round), hit: T.mi >= T.goal - 0.005, trail: thin(T.trail, 400), route: T.route ? T.route.name : null, top: +T.vTop.toFixed(1) };
+  const prev = hist.slice();
+  hist.unshift(rec); store.set('hist', hist);
+  endSession(); showDone(rec, prev);
+};
+function thin(a, n) { if (a.length <= n) return a.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); const k = a.length / n, o = []; for (let i = 0; i < n; i++) o.push(a[Math.floor(i * k)]); o.push(a[a.length - 1]); return o.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); }
+function endSession() { if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} lLayers.route && lMap.removeLayer(lLayers.route); lLayers.trail && lMap.removeLayer(lLayers.trail); lLayers = {}; route = null; T = null; }
+
+/* ---------- done ---------- */
+let dMap = null, dLayer = null;
+function showDone(r, prev) {
+  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-done')); cur = 'done';
+  const d = new Date(r.date), h = d.getHours();
+  $('#dWhen').textContent = d.toLocaleDateString([], { weekday: 'short' }) + ' · ' + (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' ' + LABEL[r.act];
+  $('#dCheck').className = 'check pop' + (r.hit ? '' : ' miss');
+  $('#dCheck').innerHTML = r.hit ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F3F4EF" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  $('#dHead').textContent = r.hit ? 'Goal reached' : Math.round(r.mi / r.goal * 100) + '% of goal';
+  $('#dHead').style.color = r.hit ? AC : 'var(--mu2)';
+  $('#dMi').textContent = r.mi.toFixed(2);
+  $('#dAvg').textContent = (r.secs ? r.mi / (r.secs / 3600) : 0).toFixed(1); $('#dTop').textContent = (r.top || 0).toFixed(1);
+  const kc = kcal(r); $('#dCal').textContent = kc ? kc : '--'; $('#dCalL').textContent = kc ? 'Calories' : 'Calories*';
+  $('#gpx').onclick = () => exportGPX(r);
+  $('#dTime').textContent = mmss(r.secs); $('#dPace').textContent = pace(r.secs, r.mi); $('#dGoal').textContent = fmtG(r.goal) + ' mi';
+  const sp = r.splits.slice(); const rem = r.mi - sp.length;
+  const rows = sp.map((s, i) => ({ n: 'Mile ' + (i + 1), s }));
+  if (rem > 0.05) rows.push({ n: rem.toFixed(2) + ' mi', s: (r.secs - sp.reduce((a, b) => a + b, 0)), p: true });
+  $('#dSplitsBox').hidden = !rows.length || (rows.length === 1 && rows[0].p);
+  const per = rows.map(x => x.p ? x.s / rem : x.s), mx = Math.max(...per), mn = Math.min(...per);
+  $('#dSplits').innerHTML = rows.map((x, i) => '<div class="sp"><span class="muted">' + x.n + '</span><div class="bar"><i class="' + (per[i] === mn && rows.length > 1 ? 'f' : '') + '" style="width:' + Math.round(per[i] / mx * 100) + '%"></i></div><b>' + mmss(per[i]) + '</b></div>').join('');
+  const badges = [];
+  const same = prev.filter(x => x.act === r.act);
+  const best = same.filter(x => x.mi >= r.goal - 0.01 && x.hit && x.goal === r.goal).map(x => x.secs);
+  if (r.hit && same.length && (!best.length || r.secs < Math.min(...best))) badges.push(['g', 'trophy', 'New best', 'Fastest ' + fmtG(r.goal) + ' mi ' + LABEL[r.act]]);
+  const far = Math.max(0, ...same.map(x => x.mi)); if (same.length && r.mi > far) badges.push(['g', 'trophy', 'Longest yet', (r.mi).toFixed(2) + ' mi ' + LABEL[r.act]]);
+  const stk = streak(hist); if (stk >= 2) badges.push(['', 'flame', stk + '-day streak', 'Keep it going']);
+  if (!same.length) badges.push(['g', 'trophy', 'First ' + LABEL[r.act], 'Welcome to Goal Miles']);
+  $('#dBadges').innerHTML = badges.slice(0, 2).map(b => '<div class="badge ' + b[0] + '">' + (b[1] === 'flame' ? '<svg viewBox="0 0 24 24" fill="none" stroke="#FF9A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 1.6 1 2.6 2 3 0-3 .5-5.5.5-8z"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>') + '<div class="t"><b>' + b[2] + '</b><span>' + b[3] + '</span></div></div>').join('');
+  $('#doneMap').hidden = r.trail.length < 2;
+  if (r.trail.length >= 2) {
+    if (!dMap) dMap = mkMap('doneMap', false);
+    setTimeout(() => { dMap.invalidateSize(); dLayer && dMap.removeLayer(dLayer); dLayer = L.polyline(r.trail, { color: AC, weight: 5 }).addTo(dMap); dMap.fitBounds(dLayer.getBounds(), { padding: [20, 20] }); }, 60);
+  }
+  $('#share').onclick = async () => { const txt = (r.hit ? 'Hit my goal: ' : '') + r.mi.toFixed(2) + ' mi ' + LABEL[r.act] + ' in ' + mmss(r.secs) + ' (' + pace(r.secs, r.mi) + '/mi) with Goal Miles'; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('Copied to clipboard'); } } catch {} };
+}
+
+/* ---------- history ---------- */
+let hF = 'all';
+const dayKey = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+function streak(h) { const days = new Set(h.map(x => dayKey(x.date))); let d = dayKey(Date.now()); if (!days.has(d)) d = dayKey(d - 864e5 + 72e5); let n = 0; while (days.has(d)) { n++; d = dayKey(d - 864e5 + 36e5); } return n; }
+let renderHist = function () {
+  const list = hist.filter(x => hF === 'all' || x.act === hF);
+  $$('#hFilt button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === hF));
+  const today = dayKey(Date.now()), days = [];
+  for (let i = 6; i >= 0; i--) { const k = dayKey(today - i * 864e5 + 36e5 * (i ? 0 : 0)); days.push(k); }
+  const fix = days.map((k, i) => dayKey(today - (6 - i) * 864e5 + 2 * 36e5));
+  const vals = fix.map(k => list.filter(x => dayKey(x.date) === k).reduce((a, b) => a + b.mi, 0));
+  const mx = Math.max(2, ...vals);
+  $('#hChart').innerHTML = fix.map((k, i) => { const v = vals[i], t = i === 6; return '<div><span>' + (v ? v.toFixed(1) : '') + '</span><i class="' + (v ? 'v ' : '') + (t && v ? 'today' : '') + '" style="height:' + (v ? Math.max(8, Math.round(v / mx * 86)) : 4) + 'px"></i><em class="' + (t ? 'today' : '') + '">' + new Date(k).toLocaleDateString([], { weekday: 'narrow' }) + '</em></div>'; }).join('');
+  const wk = vals.reduce((a, b) => a + b, 0);
+  $('#hChart').setAttribute('aria-label', 'Miles per day for the last 7 days, total ' + wk.toFixed(1));
+  $('#hWeek').textContent = wk.toFixed(1);
+  const s = streak(hist); $('#hStreak').textContent = s; $('#hStreakU').textContent = s === 1 ? 'day' : 'days';
+  const hits = list.filter(x => x.hit && dayKey(x.date) >= fix[0]).length; $('#hGoals').textContent = hits + ' goal' + (hits === 1 ? '' : 's') + ' hit';
+  const splits = list.flatMap(x => x.splits || []); const longest = Math.max(0, ...list.map(x => x.mi));
+  const weeks = {}; list.forEach(x => { const d = new Date(x.date); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); weeks[d.getTime()] = (weeks[d.getTime()] || 0) + x.mi; });
+  const bw = Math.max(0, ...Object.values(weeks));
+  $('#hBests').innerHTML = [['Fastest mile', splits.length ? mmss(Math.min(...splits)) : '--'], ['Longest', longest ? longest.toFixed(2) + ' mi' : '--'], ['Best week', bw ? bw.toFixed(1) + ' mi' : '--'], ['Total', list.reduce((a, b) => a + b.mi, 0).toFixed(1) + ' mi']].map(([k, v]) => '<div class="kv"><span>' + k + '</span><b>' + v + '</b></div>').join('');
+  $('#hRecent').innerHTML = list.length ? list.slice(0, 15).map(x => { const d = new Date(x.date), h = d.getHours(); return '<div class="rec"><div class="ic' + (x.hit ? '' : ' miss') + '">' + (x.hit ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9BA19B" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>') + '</div><div class="t"><b>' + (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' ' + LABEL[x.act] + '</b><span>' + (dayKey(x.date) === today ? 'Today' : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })) + ' · ' + mmss(x.secs) + ' · ' + (x.hit ? 'goal hit' : 'goal ' + fmtG(x.goal) + ' mi') + '</span></div><span class="d">' + x.mi.toFixed(2) + '</span></div>'; }).join('') : '<div class="msg">No workouts yet. Set a goal and hit start.</div>';
+}
+const _rh = renderHist; renderHist = function () { _rh(); renderAch(); };
+$$('#hFilt button').forEach(b => b.onclick = () => { hF = b.dataset.v; renderHist(); });
+
+
+/* ---------- fitness engine ---------- */
+const MET = { walk: 3.8, run: 9.8, bike: 7.5 };
+function kcal(r) { if (!S.wt) return 0; const met = r.act === 'walk' ? (r.secs && r.mi / (r.secs / 3600) > 3.5 ? 4.8 : 3.5) : MET[r.act]; return Math.round(met * S.wt * 0.4536 * r.secs / 3600); }
+const recent = (act, days = 120) => hist.filter(x => x.act === act && x.secs > 0 && x.mi > 0.2 && Date.now() - x.date < days * 864e5);
+function predict(act, D) {
+  let best = 0;
+  recent(act).forEach(x => { if (x.mi >= 0.95) { const t = x.secs * Math.pow(D / x.mi, 1.06); if (!best || t < best) best = t; } (x.splits || []).forEach(sp => { const t = sp * Math.pow(D, 1.06); if (D <= 3.2 && (!best || t < best)) best = t; }); });
+  return best;
+}
+function bestPaceFor(act, D) { const c = recent(act, 365).filter(x => x.mi >= D * 0.9 && x.mi <= D * 1.4); if (!c.length) return 0; return Math.min(...c.map(x => x.secs / x.mi)); }
+const weekStart = (t = Date.now()) => { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); return d.getTime(); };
+const monthStart = (t = Date.now()) => { const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(1); return d.getTime(); };
+const milesSince = (act, t0) => hist.filter(x => (act === 'all' || x.act === act) && x.date >= t0).reduce((a, b) => a + b.mi, 0);
+function loadWorkout(act, dist, pc, label) { S.act = act; S.goal = Math.max(0.25, +dist.toFixed(2)); if (pc) { S.pace[act] = Math.round(pc); S.pacer = true; } save(); go('setup'); toast(label + ' loaded. Hit start.'); }
+
+/* ---------- goals ---------- */
+let goals = store.get('goals', []), gAct = S.act, gs = { type: 'race', act: S.act, dist: 3.1 };
+const GT = { race: 'Race time', mile: 'Fastest mile', week: 'Weekly miles', month: 'Monthly miles', streak: 'Streak' };
+const DN = d => ({ 1: '1 mi', 3.1: '5K', 6.2: '10K', 13.1: 'Half marathon', 26.2: 'Marathon' })[d] || d + ' mi';
+function coachTip() {
+  const mine = hist.filter(x => x.act === gAct);
+  if (!mine.length) return 'Log a few ' + LABEL[gAct] + 's and predictions get sharper. Even one easy mile gives the coach something to work with.';
+  const days = Math.floor((Date.now() - mine[0].date) / 864e5);
+  const tw = milesSince(gAct, weekStart()), lw = milesSince(gAct, weekStart() - 7 * 864e5) - tw;
+  if (days >= 4) return "It's been " + days + ' days since your last ' + LABEL[gAct] + '. A short easy one today restarts the habit.';
+  if (lw > 0 && tw > lw * 1.3) return 'You\'re ' + Math.round((tw / lw - 1) * 100) + '% over last week already. Keep the rest of this week easy so your legs catch up.';
+  const st = streak(hist); if (st >= 3) return st + '-day streak. Mix in an easy day so you can keep it going.';
+  if (lw > 0) return 'Last week: ' + lw.toFixed(1) + ' mi. A safe target this week is about ' + (lw * 1.1).toFixed(1) + ' mi (+10%).';
+  return 'Nice start. Aim for 3 sessions this week, one of them a little longer than the others.';
+}
+function renderGoals() {
+  $$('#gAct button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === gAct));
+  $('#gTip').innerHTML = '<div class="tip"><svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg><span>' + coachTip() + '</span></div>';
+  const D = [[1, '1 mi'], [3.1, '5K'], [6.2, '10K'], [13.1, 'Half']];
+  const any = D.some(([d]) => predict(gAct, d));
+  $('#gPred').innerHTML = D.map(([d, l]) => { const t = predict(gAct, d); return '<div><small>' + l + '</small><b>' + (t ? mmss(t) : '--') + '</b></div>'; }).join('');
+  $('#gPredNote').textContent = any ? 'from your last 120 days' : 'log a 1 mi+ ' + LABEL[gAct] + ' first';
+  const list = goals.filter(g => g.act === gAct || g.type === 'streak');
+  $('#gList').innerHTML = list.length ? '' : '<div class="msg"><b>No goals yet.</b> Tap + to add one, like a 5K under 30 minutes or 15 miles a week. The coach will build workouts to get you there.</div>';
+  list.forEach(g => $('#gList').appendChild(goalCard(g)));
+}
+function goalCard(g) {
+  const el = document.createElement('div'); el.className = 'gl';
+  const ez = { walk: 90, run: 75, bike: 40 }[g.act];
+  let title = '', sub = '', pct = 0, k = [], wos = [];
+  const left = g.by ? Math.ceil((g.by - Date.now()) / 864e5) : null;
+  const leftTxt = left == null ? '' : left >= 0 ? ' · ' + left + ' days left' : ' · past due';
+  if (g.type === 'race' || g.type === 'mile') {
+    const D = g.type === 'mile' ? 1 : g.dist, need = g.time / D, pr = predict(g.act, D);
+    title = (g.type === 'mile' ? 'Mile' : DN(D)) + ' ' + LABEL[g.act] + ' in ' + mmss(g.time);
+    pct = pr ? Math.min(1, g.time / pr) : 0;
+    sub = pr ? (pr <= g.time ? "You're ready. Go get it." : mmss(pr - g.time) + ' to cut') + leftTxt : 'Log a workout to get a prediction' + leftTxt;
+    k = [['Goal pace', mmss(need)], ['Now', pr ? mmss(pr / D) : '--'], ['Predicted', pr ? mmss(pr) : '--']];
+    const base = pr ? pr / D : need + 60;
+    wos = [
+      ['Easy builder', fmtG(+(Math.min(D * 0.8, D + 1)).toFixed(1)) + ' mi at ' + mmss(base + ez) + ' /mi. Keep it relaxed.', Math.max(1, Math.round(D * 0.8 * 2) / 2), base + ez],
+      ['Goal-pace rehearsal', fmtG(Math.max(0.5, Math.round(D * 0.4 * 4) / 4)) + ' mi right at ' + mmss(need) + ' /mi with the pacer on.', Math.max(0.5, Math.round(D * 0.4 * 4) / 4), need],
+      ['Speed quarters', '1 mi: hit ¼-mile pushes at ' + mmss(need - (g.act === 'bike' ? 15 : 30)) + ' pace, easy between.', 1, need - (g.act === 'bike' ? 15 : 30)]
+    ];
+    if (D >= 3) wos.push(['Long one', fmtG(Math.round(D * 1.25 * 2) / 2) + ' mi slow and steady at ' + mmss(base + ez + 30) + ' /mi.', Math.round(D * 1.25 * 2) / 2, base + ez + 30]);
+    if (pr && pr <= g.time) wos.unshift(['Race it', DN(D) + ' with the pacer at ' + mmss(need) + ' /mi.', D, need]);
+  } else if (g.type === 'week' || g.type === 'month') {
+    const t0 = g.type === 'week' ? weekStart() : monthStart(), done = milesSince(g.act, t0);
+    const end = g.type === 'week' ? t0 + 7 * 864e5 : new Date(new Date(t0).getFullYear(), new Date(t0).getMonth() + 1, 1).getTime();
+    const dl = Math.max(1, Math.ceil((end - Date.now()) / 864e5)), rem = Math.max(0, g.n - done);
+    title = fmtG(g.n) + ' mi ' + (g.type === 'week' ? 'this week' : 'this month') + ' · ' + LABEL[g.act];
+    pct = Math.min(1, done / g.n);
+    sub = rem ? fmtG(+rem.toFixed(1)) + ' mi to go · ' + dl + ' day' + (dl > 1 ? 's' : '') + ' left' : 'Done! Anything extra is a bonus.';
+    k = [['Done', done.toFixed(1)], ['Left', rem.toFixed(1)], ['Per day', rem ? (rem / dl).toFixed(1) : '0']];
+    if (rem) { const today = Math.min(rem, Math.max(1, Math.ceil(rem / dl * 2) / 2)); wos = [['Today\'s share', fmtG(today) + ' mi keeps you on track.', today, 0]]; if (dl > 1 && rem / dl < 3) wos.push(['Get ahead', fmtG(Math.min(rem, Math.ceil(rem / dl * 2))) + ' mi today buys you a rest day.', Math.min(rem, Math.ceil(rem / dl * 2)), 0]); }
+  } else {
+    const st = streak(hist), today = hist.some(x => dayKey(x.date) === dayKey(Date.now()));
+    title = g.n + '-day streak'; pct = Math.min(1, st / g.n);
+    sub = st >= g.n ? 'Streak goal hit. Keep it rolling.' : (g.n - st) + ' more day' + (g.n - st > 1 ? 's' : '') + (today ? ' · today counts ✓'.replace(' ✓', ', done') : ' · nothing logged today yet');
+    k = [['Current', st + 'd'], ['Goal', g.n + 'd'], ['Today', today ? 'Done' : 'Open']];
+    if (!today) wos = [['Keep it alive', 'A quick 1 mi ' + LABEL[S.act] + ' counts.', 1, 0]];
+  }
+  el.innerHTML = '<div class="hd"><div class="t"><b>' + title + '</b><span>' + sub + '</span></div><button class="x" aria-label="Delete goal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div><div class="pbar"><i style="width:' + Math.round(pct * 100) + '%"></i></div><div class="kpis">' + k.map(([a, b]) => '<div><small>' + a + '</small><b>' + b + '</b></div>').join('') + '</div>' + wos.map((w, i) => '<div class="wo"><div class="t"><b>' + w[0] + '</b><span>' + w[1] + '</span></div><button data-i="' + i + '">Start</button></div>').join('');
+  el.querySelector('.x').onclick = () => { goals = goals.filter(x => x.id !== g.id); store.set('goals', goals); renderGoals(); };
+  el.querySelectorAll('.wo button').forEach(b => b.onclick = () => { const w = wos[+b.dataset.i]; loadWorkout(g.type === 'streak' ? S.act : g.act, w[2], w[3], w[0]); });
+  return el;
+}
+$$('#gAct button').forEach(b => b.onclick = () => { gAct = b.dataset.v; renderGoals(); });
+function renderGS() {
+  $$('#gsType button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === gs.type));
+  $$('#gsAct button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === gs.act));
+  $$('#gsDist button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === gs.dist));
+  $('#gsDistF').hidden = gs.type !== 'race';
+  $('#gsTimeF').style.display = (gs.type === 'race' || gs.type === 'mile') ? '' : 'none';
+  $('#gsNF').hidden = !['week', 'month', 'streak'].includes(gs.type);
+  $('#gsNL').textContent = gs.type === 'streak' ? 'Days in a row' : 'Miles';
+  $('#gsN').placeholder = gs.type === 'streak' ? '7' : gs.type === 'week' ? '15' : '60';
+  $('#gsByF').hidden = !(gs.type === 'race' || gs.type === 'mile');
+  $('#gsAct').parentElement.hidden = gs.type === 'streak';
+}
+$('#addGoal').onclick = () => { gs = { type: 'race', act: gAct, dist: 3.1 }; ['gsMin', 'gsSec', 'gsN', 'gsBy'].forEach(i => $('#' + i).value = ''); renderGS(); $('#goalSheet').classList.add('on'); };
+$('#gsClose').onclick = () => $('#goalSheet').classList.remove('on');
+$('#goalSheet').addEventListener('click', e => { if (e.target.id === 'goalSheet') $('#goalSheet').classList.remove('on'); });
+$$('#gsType button').forEach(b => b.onclick = () => { gs.type = b.dataset.v; renderGS(); });
+$$('#gsAct button').forEach(b => b.onclick = () => { gs.act = b.dataset.v; renderGS(); });
+$$('#gsDist button').forEach(b => b.onclick = () => { gs.dist = +b.dataset.v; renderGS(); });
+$('#gsSave').onclick = () => {
+  const g = { id: Date.now(), type: gs.type, act: gs.type === 'streak' ? 'all' : gs.act };
+  if (gs.type === 'race' || gs.type === 'mile') { const t = (parseInt($('#gsMin').value) || 0) * 60 + (parseInt($('#gsSec').value) || 0); if (!t) return toast('Enter a target time'); g.time = t; g.dist = gs.type === 'mile' ? 1 : gs.dist; if ($('#gsBy').value) g.by = new Date($('#gsBy').value + 'T23:59').getTime(); }
+  else { const n = parseFloat($('#gsN').value); if (!n || n <= 0) return toast('Enter a number'); g.n = gs.type === 'streak' ? Math.round(n) : n; }
+  goals.unshift(g); store.set('goals', goals); $('#goalSheet').classList.remove('on'); if (g.act !== 'all') gAct = g.act; renderGoals(); toast('Goal added');
+};
+
+/* ---------- achievements ---------- */
+function achievements() {
+  const tot = hist.reduce((a, b) => a + b.mi, 0), mx = Math.max(0, ...hist.map(x => x.mi)), hits = hist.filter(x => x.hit).length;
+  let bestStreak = 0; { const days = [...new Set(hist.map(x => dayKey(x.date)))].sort((a, b) => a - b); let run = 0, prev = 0; days.forEach(d => { run = prev && d - prev < 1.1 * 864e5 ? run + 1 : 1; prev = d; bestStreak = Math.max(bestStreak, run); }); }
+  const hr = hist.map(x => new Date(x.date).getHours());
+  return [
+    ['First steps', 'Log a workout', hist.length > 0], ['On target', 'Hit a goal', hits > 0], ['Closer', 'Hit 10 goals', hits >= 10],
+    ['10 club', '10 total miles', tot >= 10], ['50 club', '50 total miles', tot >= 50], ['Century', '100 total miles', tot >= 100],
+    ['5K', '3.1 mi in one go', mx >= 3.1], ['10K', '6.2 mi in one go', mx >= 6.2], ['Half', '13.1 mi in one go', mx >= 13.1],
+    ['Hat trick', '3-day streak', bestStreak >= 3], ['Full week', '7-day streak', bestStreak >= 7], ['Iron habit', '30-day streak', bestStreak >= 30],
+    ['Early bird', 'Start before 7 AM', hr.some(h => h < 7)], ['Night owl', 'Start after 9 PM', hr.some(h => h >= 21)], ['All-rounder', 'Walk, run & bike', new Set(hist.map(x => x.act)).size === 3]
+  ];
+}
+function renderAch() {
+  const a = achievements(), n = a.filter(x => x[2]).length;
+  $('#hAchN').textContent = n + ' of ' + a.length;
+  $('#hAch').innerHTML = a.map(([t, d, on]) => '<div class="' + (on ? '' : 'lk') + '"><svg viewBox="0 0 24 24" fill="none" stroke="' + (on ? '#D6F94B' : '#9BA19B') + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"/><path d="M9 14.5 8 22l4-2 4 2-1-7.5"/></svg><b>' + t + '</b><span>' + (on ? 'Unlocked' : d) + '</span></div>').join('');
+}
+
+/* ---------- GPX ---------- */
+async function exportGPX(r) {
+  if (r.trail.length < 2) return toast('No GPS track to export');
+  const t0 = r.date, n = r.trail.length;
+  const pts = r.trail.map((p, i) => '<trkpt lat="' + p[0] + '" lon="' + p[1] + '"><time>' + new Date(t0 + r.secs * 1000 * i / (n - 1)).toISOString() + '</time></trkpt>').join('');
+  const xml = '<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="Goal Miles" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>Goal Miles ' + LABEL[r.act] + '</name><type>' + r.act + '</type><trkseg>' + pts + '</trkseg></trk></gpx>';
+  const name = 'goal-miles-' + new Date(t0).toISOString().slice(0, 10) + '.gpx';
+  const file = new File([xml], name, { type: 'application/gpx+xml' });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) return await navigator.share({ files: [file], title: name }); } catch (e) { if (e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---------- weather + sunset ---------- */
+let wx = null;
+async function loadWeather(force) {
+  const cached = store.get('wx', null);
+  if (cached && Date.now() - cached.at < 20 * 60e3 && !force) { wx = cached; return renderWx(); }
+  let p = lastFix || store.get('lastLoc', null);
+  if (!p && navigator.permissions) { try { const st = await navigator.permissions.query({ name: 'geolocation' }); if (st.state === 'granted') p = await locate(); } catch {} }
+  if (!p) return;
+  store.set('lastLoc', p);
+  try {
+    const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + p[0].toFixed(3) + '&longitude=' + p[1].toFixed(3) + '&current=temperature_2m,apparent_temperature,wind_speed_10m,weather_code&daily=sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=1';
+    const j = await (await fetch(u)).json();
+    wx = { at: Date.now(), t: j.current.temperature_2m, f: j.current.apparent_temperature, w: j.current.wind_speed_10m, c: j.current.weather_code, sun: j.daily.sunset[0] };
+    store.set('wx', wx); renderWx();
+  } catch {}
+}
+function renderWx() {
+  if (!wx) return;
+  const e = $('#wx'), sun = new Date(wx.sun), finish = Date.now() + S.goal * S.pace[S.act] * 1000;
+  const rain = [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(wx.c);
+  let tip = '';
+  if (finish > sun.getTime() && Date.now() < sun.getTime() + 36e5 * 1.5 && Date.now() > sun.getTime() - 36e5 * 4) tip = 'Finishes after sunset. Wear something bright.';
+  else if (wx.f >= 88) tip = 'Hot out. Bring water.';
+  else if (rain) tip = 'Rain around. Watch your footing.';
+  else if (wx.w >= 18) tip = 'Windy. Start into the wind, finish with it.';
+  else if (wx.f <= 40) tip = 'Cold. Layer up.';
+  e.hidden = false; e.className = 'wx' + (tip ? ' warn' : '');
+  e.innerHTML = '<b>' + Math.round(wx.t) + '°</b> · wind ' + Math.round(wx.w) + ' mph · sunset ' + clock(sun) + (tip ? '<br>' + tip : '');
+}
+
+/* ---------- resume after reload ---------- */
+(function resume() {
+  const L0 = store.get('live', null);
+  if (!L0 || L0.done || Date.now() - L0.lastTick > 3 * 3600e3) return;
+  T = Object.assign(L0, { lastTick: Date.now(), lastMove: Date.now(), last: null, running: true, paused: true });
+  showLive(); startGPS(); keepAwake(); toast('Picked up your ' + LABEL[T.act] + ' where you left off. Tap play to resume.', 4000);
+})();
+
+renderSetup();
+loadWeather();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
