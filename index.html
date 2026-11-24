@@ -47,6 +47,9 @@ button:disabled{opacity:.4;cursor:default}
 .rb svg{width:24px;height:24px}
 .goal{display:flex;flex-direction:column;align-items:center}
 .goal .num{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.goal .num{touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:text}
+#goalIn::selection{background:rgba(214,249,75,.3);color:#F3F4EF}
+#goalIn{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;text-align:center;background:transparent;border:none;border-bottom:3px solid var(--ac);border-radius:0;color:var(--tx);padding:0;margin:0;outline:none;caret-color:var(--ac);max-width:62vw;font-variant-numeric:tabular-nums}
 .lbl{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
 .muted{color:var(--mu)}
 .eta{text-align:center;margin:-4px 0 0;font-size:14px;color:var(--mu)}
@@ -284,7 +287,7 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
   </div>
   <div class="stepper">
     <button class="rb" id="dec" aria-label="Decrease goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
-    <div class="goal"><span class="num" id="goalNum" aria-live="polite">2</span><span class="lbl" id="goalUnit">miles</span></div>
+    <div class="goal"><span class="num" id="goalNum" aria-live="polite" title="Double-tap to type a distance">2</span><input id="goalIn" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Goal distance in miles" hidden><span class="lbl" id="goalUnit">miles</span></div>
     <button class="rb ac" id="inc" aria-label="Increase goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
   </div>
   <p class="eta" id="eta"></p>
@@ -447,7 +450,7 @@ let hist = store.get('hist', []);
 let route = null, rType = 'loop', rOpts = [], rPick = 0, rSeed = 0;
 
 /* ---------- utils ---------- */
-const fmtG = g => Number.isInteger(g) ? String(g) : (+g.toFixed(1)).toString();
+const fmtG = g => Number.isInteger(g) ? String(g) : String(+(+g).toFixed(2));
 const mmss = t => { t = Math.max(0, Math.round(t)); const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; return h ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') : m + ':' + String(s).padStart(2, '0'); };
 const pace = (sec, mi) => mi > 0.02 ? mmss(sec / mi) : '--';
 const clock = d => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -507,6 +510,28 @@ function renderSetup() {
 $$('#act button').forEach(b => b.onclick = () => { S.act = b.dataset.v; save(); renderSetup(); });
 $('#dec').onclick = () => { S.goal = S.goal <= 1 ? 0.5 : Math.ceil(S.goal) - 1; save(); renderSetup(); };
 $('#inc').onclick = () => { S.goal = S.goal < 1 ? 1 : Math.min(100, Math.floor(S.goal) + 1); save(); renderSetup(); };
+let editing = false, lastTap = 0;
+const gIn = $('#goalIn'), gNum = $('#goalNum');
+const fitIn = () => { gIn.style.width = Math.max(1.6, gIn.value.length + 0.6) + 'ch'; };
+function editGoal() {
+  if (editing) return; editing = true;
+  gIn.value = fmtG(S.goal); fitIn();
+  gNum.hidden = true; gIn.hidden = false; gIn.focus(); gIn.select();
+}
+function commitGoal(ok) {
+  if (!editing) return; editing = false;
+  if (ok) {
+    const v = parseFloat(gIn.value.replace(',', '.'));
+    if (v > 0) { S.goal = Math.min(100, Math.max(0.1, Math.round(v * 100) / 100)); save(); }
+    else if (gIn.value.trim()) toast('Enter a distance like 4.2');
+  }
+  gIn.hidden = true; gNum.hidden = false; renderSetup();
+}
+gNum.addEventListener('pointerup', () => { const n = Date.now(); if (n - lastTap < 350) { lastTap = 0; editGoal(); } else lastTap = n; });
+gNum.addEventListener('dblclick', editGoal);
+gIn.addEventListener('input', () => { const c = gIn.value.replace(/[^0-9.,]/g, ''); if (c !== gIn.value) gIn.value = c; fitIn(); });
+gIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gIn.blur(); } else if (e.key === 'Escape') { commitGoal(false); } });
+gIn.addEventListener('blur', () => commitGoal(true));
 $$('#chips button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderSetup(); });
 $$('.sw[data-k]').forEach(b => b.onclick = () => { S[b.dataset.k] = !S[b.dataset.k]; save(); renderSetup(); });
 $('#pDec').onclick = () => { S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
