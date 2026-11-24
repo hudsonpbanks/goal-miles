@@ -1,4 +1,4 @@
-const C = 'gm-v10';
+const C = 'gm-v11';
 const FONTS = ['Barlow-400', 'Barlow-500', 'Barlow-600', 'Barlow-700', 'BarlowCondensed-500', 'BarlowCondensed-600', 'BarlowCondensed-700'].map(f => './fonts/' + f + '.woff2');
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', ...FONTS,
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'];

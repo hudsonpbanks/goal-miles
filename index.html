@@ -147,9 +147,25 @@ button:disabled{opacity:.4;cursor:default}
 .play{width:96px;height:96px;border-radius:48px;border:none;background:var(--ac);color:var(--onac);display:flex;align-items:center;justify-content:center}
 .play svg{width:34px;height:34px}
 .ctrl .rb{background:var(--s1);border:none}
-#liveMap{display:none;height:auto;flex:1 1 280px;min-height:240px}
-.mapmode #liveMap{display:block}
+#navW{display:none;position:relative;flex:1 1 320px;min-height:280px}
+#liveMap{position:absolute;inset:0;height:auto;border-radius:22px}
+.mapmode #navW{display:block}
 .mapmode .ring{display:none}
+.mapmode .turn{order:-1;margin:-4px 0 -4px;background:var(--ac);color:var(--onac);padding:14px 16px;border-radius:18px}
+.mapmode .turn .ar{background:rgba(0,0,0,.14)}
+.mapmode .turn .ar svg{stroke:var(--onac)!important}
+.mapmode .turn .t b{font-size:30px}
+.mapmode .turn .t span{color:var(--onac);opacity:.9;font-size:16px;font-weight:600;white-space:normal}
+.mapmode .top{order:-2}
+.navchip{position:absolute;left:12px;bottom:12px;z-index:500;display:flex;align-items:baseline;gap:6px;padding:10px 14px;border-radius:16px;background:var(--glass);box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.navchip b{font:700 28px/1 var(--cond);font-variant-numeric:tabular-nums}
+.navchip span{font-size:13px;font-weight:600;color:var(--mu2)}
+.recenter{position:absolute;right:12px;bottom:12px;z-index:500;height:44px;padding:0 16px;border:none;border-radius:22px;background:var(--tx);color:var(--bg);display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.recenter svg{width:18px;height:18px}
+.navme{width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.navme div{width:30px;height:30px;border-radius:15px;background:#3B82F6;border:3px solid #fff;box-shadow:0 0 0 7px rgba(59,130,246,.25),0 2px 6px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;transition:transform .4s}
+.navme svg{width:16px;height:16px}
+.navturn{width:14px;height:14px;border-radius:7px;background:#fff;border:3px solid var(--ac)}
 .count{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:var(--bg)}
 .count.on{display:flex}
 .count b{font-family:var(--cond);font-weight:700;font-size:200px;line-height:1;color:var(--ac)}
@@ -514,7 +530,7 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
     <svg viewBox="0 0 320 320" role="img" id="ringSvg" aria-label="Progress"><circle cx="160" cy="160" r="144" fill="none" style="stroke:var(--s2)" stroke-width="16"/><circle id="prog" cx="160" cy="160" r="144" fill="none" stroke="#D6F94B" stroke-width="16" stroke-linecap="round" stroke-dasharray="904.78" stroke-dashoffset="904.78" transform="rotate(-90 160 160)"/></svg>
     <div class="c"><span class="lbl" id="lLeftLbl">Miles to go</span><span class="big" id="lLeft" aria-live="off">2.00</span><span class="sr" id="lLive" aria-live="polite"></span><span class="muted" style="font-size:14px"><b style="color:var(--tx)" id="lDone">0.00</b> of <span id="lGoal">2</span> mi</span></div>
   </div>
-  <div class="map" id="liveMap"></div>
+  <div class="navw" id="navW"><div class="map" id="liveMap"></div><div class="navchip" id="navChip"><b id="ncMi">0.00</b><span id="ncSub">mi to go</span></div><button class="recenter" id="recenter" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4.5 20.3l.7.7L12 18l6.8 3 .7-.7z"/></svg>Re-center</button></div>
   <div class="turn" id="turn"><div class="ar" id="turnIc"></div><div class="t"><b id="turnD"></b><span id="turnT"></span></div></div>
   <div class="banner" id="bHalf"><svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><div class="t"><b>Halfway. Turn around.</b><span>Head back the way you came to finish at home.</span></div></div>
   <div class="banner warn" id="bOff"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9A5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div class="t"><b>Off route</b><span>Your miles still count. Check the map to get back on.</span></div></div>
@@ -880,7 +896,7 @@ async function osrm(pts) {
   if (!r.ok) throw new Error('Route service error ' + r.status);
   const j = await r.json(); if (j.code !== 'Ok' || !j.routes || !j.routes[0]) throw new Error('No walkable route found here.');
   const rt = j.routes[0], coords = rt.geometry.coordinates.map(c => [c[1], c[0]]);
-  const steps = []; rt.legs.forEach((lg, li) => lg.steps.forEach(st => { if ((st.maneuver.type === 'arrive' && li < rt.legs.length - 1) || (st.maneuver.type === 'depart' && li > 0)) return; let bi = 0, bd = 1e9; const loc = [st.maneuver.location[1], st.maneuver.location[0]]; for (let i = 0; i < coords.length; i++) { const d = Math.abs(coords[i][0] - loc[0]) + Math.abs(coords[i][1] - loc[1]); if (d < bd) { bd = d; bi = i; } } steps.push({ i: bi, text: osrmText(st), type: OT[st.maneuver.type] ?? OM[st.maneuver.modifier] ?? 6 }); }));
+  const steps = []; let cur = 0; rt.legs.forEach((lg, li) => lg.steps.forEach(st => { if ((st.maneuver.type === 'arrive' && li < rt.legs.length - 1) || (st.maneuver.type === 'depart' && li > 0)) return; let bi = cur, bd = 1e9; const loc = [st.maneuver.location[1], st.maneuver.location[0]]; if (st.maneuver.type === 'arrive') { steps.push({ i: coords.length - 1, text: osrmText(st), type: 10 }); return; } for (let i = cur; i < Math.min(coords.length, cur + 400); i++) { const d = Math.abs(coords[i][0] - loc[0]) + Math.abs(coords[i][1] - loc[1]); if (d < bd) { bd = d; bi = i; } } cur = bi; steps.push({ i: bi, text: osrmText(st), type: OT[st.maneuver.type] ?? OM[st.maneuver.modifier] ?? 6 }); }));
   steps.sort((a, b) => a.i - b.i);
   const out = { coords, steps, m: rt.distance }; rCache.set(key, JSON.stringify(out)); return out;
 }
@@ -984,7 +1000,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 
 function newSession() {
   const gm = GM(), useR = gm === 'dist' ? route : null;
-  return { mode: gm, tsec: gm === 'time' ? MINS() * 60 : 0, act: S.act, goal: gm === 'dist' ? S.goal : 0, start: Date.now(), mi: 0, active: 0, lastTick: Date.now(), paused: false, auto: false, last: null, lastMove: Date.now(), trail: [], splits: [], nextSplit: 1, nextQ: 0.25, half: false, goalHit: false, route: useR, ri: 0, spoke: -1, offN: 0, acc: null, outback: gm !== 'free' && (S.outback || !!(useR && useR.type === 'out')), pacer: S.pacer, target: S.pace[S.act], autop: S.autop, sb: [], vNow: 0, vTop: 0 };
+  return { mode: gm, tsec: gm === 'time' ? MINS() * 60 : 0, act: S.act, goal: gm === 'dist' ? S.goal : 0, start: Date.now(), mi: 0, active: 0, lastTick: Date.now(), paused: false, auto: false, last: null, lastMove: Date.now(), trail: [], splits: [], nextSplit: 1, nextQ: 0.25, half: false, goalHit: false, route: useR, mapMode: !!useR, follow: true, ri: 0, spoke: -1, offN: 0, acc: null, outback: gm !== 'free' && (S.outback || !!(useR && useR.type === 'out')), pacer: S.pacer, target: S.pace[S.act], autop: S.autop, sb: [], vNow: 0, vTop: 0 };
 }
 $('#start').onclick = () => {
   primeAudio(); T = newSession(); showLive(); keepAwake(); startGPS();
@@ -995,7 +1011,7 @@ $('#start').onclick = () => {
 function showLive() {
   showScreen('live');
   if ($('#lGoal')) $('#lGoal').textContent = fmtG(T.goal); $('#bGoal b').textContent = T.mode === 'time' ? 'Time goal reached' : 'Goal reached';
-  $('#s-live').classList.toggle('mapmode', !!T.route && !!T.mapMode);
+  $('#s-live').classList.toggle('mapmode', !!T.mapMode); $('#viewTog').setAttribute('aria-label', T.mapMode ? 'Show progress ring' : 'Show map'); $('#recenter').hidden = true;
   $('#turn').classList.toggle('on', !!T.route);
   ['bHalf', 'bOff', 'bGoal'].forEach(id => $('#' + id).classList.remove('on'));
   if (!ticker) ticker = setInterval(tick, 1000);
@@ -1042,14 +1058,15 @@ function onFix(p) {
   checkCues();
   render();
 }
+function projSeg(pt, a, b) { const k = Math.cos(rad(pt[0])) * 111320, ax = (a[1] - pt[1]) * k, ay = (a[0] - pt[0]) * 110540, bx = (b[1] - pt[1]) * k, by = (b[0] - pt[0]) * 110540, dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy; let t = L2 ? -(ax * dx + ay * dy) / L2 : 0; t = Math.max(0, Math.min(1, t)); const x = ax + t * dx, y = ay + t * dy; return { d: Math.hypot(x, y), t }; }
 function followRoute(pt) {
-  const r = T.route; let best = 1e9, bi = T.ri;
-  for (let i = Math.max(0, T.ri - 5); i < Math.min(r.coords.length, T.ri + 80); i++) { const d = hav(pt, r.coords[i]); if (d < best) { best = d; bi = i; } }
-  if (best < 45) { T.ri = Math.max(T.ri, bi); T.offN = 0; $('#bOff').classList.remove('on'); }
+  const r = T.route, c = r.coords; let best = 1e9, bi = T.ri, bt = 0;
+  for (let i = Math.max(0, T.ri - 3); i < Math.min(c.length - 1, T.ri + 60); i++) { const q = projSeg(pt, c[i], c[i + 1]); if (q.d < best - 0.5) { best = q.d; bi = i; bt = q.t; } }
+  if (best < 45) { const m = r.cum[bi] + bt * (r.cum[bi + 1] - r.cum[bi]); if (m >= (T.rm || 0) - 15) { T.ri = bi; T.rm = Math.max(T.rm || 0, m); } T.offN = 0; $('#bOff').classList.remove('on'); }
   else if (++T.offN >= 3) { if (!$('#bOff').classList.contains('on')) { $('#bOff').classList.add('on'); say('Off route.'); } }
   const nx = r.steps.find(s => s.i > T.ri && s.type !== 11);
   if (!nx) return;
-  const dm = r.cum[nx.i] - r.cum[T.ri];
+  const dm = r.cum[nx.i] - (T.rm || r.cum[T.ri]);
   if (dm < 35 && T.spoke !== nx.i) { T.spoke = nx.i; say(nx.text); chime(1); }
 }
 function checkCues() {
@@ -1121,7 +1138,7 @@ function render() {
   $('#pause').setAttribute('aria-label', T.paused ? 'Resume' : 'Pause');
   if (T.route) {
     const r = T.route, nx = r.steps.find(s => s.i > T.ri && s.type !== 11);
-    if (nx) { $('#turnD').textContent = feet(r.cum[nx.i] - r.cum[T.ri]); $('#turnT').textContent = nx.text; $('#turnIc').innerHTML = arrow(nx.type); }
+    if (nx) { $('#turnD').textContent = feet(Math.max(0, r.cum[nx.i] - (T.rm || r.cum[T.ri]))); $('#turnT').textContent = nx.text; $('#turnIc').innerHTML = arrow(nx.type); }
     else { $('#turnD').textContent = 'Finish'; $('#turnT').textContent = 'Keep going to hit your goal'; $('#turnIc').innerHTML = arrow(10); }
   }
   if (T.mapMode) drawLive();
@@ -1130,18 +1147,39 @@ function arrow(t) {
   const P = { 0: 'M18 18v-6a3 3 0 0 0-3-3H6M10 5 6 9l4 4', 1: 'M6 18v-6a3 3 0 0 1 3-3h9M14 5l4 4-4 4', 2: 'M17 19V9H7M11 5 7 9l4 4', 3: 'M7 19V9h10M13 5l4 4-4 4', 4: 'M15 19v-7L8 5M8 11V5h6', 5: 'M9 19v-7l7-7M16 11V5h-6', 12: 'M15 19v-7L8 5M8 11V5h6', 13: 'M9 19v-7l7-7M16 11V5h-6', 9: 'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11', 10: 'M5 21V4M5 4h12l-2 4 2 4H5' };
   return '<svg viewBox="0 0 24 24" fill="none" stroke="' + AC + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (P[t] || 'M12 19V5M6 11l6-6 6 6') + '"/></svg>';
 }
+const navIcon = () => L.divIcon({ className: '', html: '<div class="navme"><div id="navArrow"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 3 5.5 19.5 12 16l6.5 3.5z"/></svg></div></div>', iconSize: [30, 30] });
+function heading() { const t = T.trail; for (let k = t.length - 2; k >= 0 && k >= t.length - 12; k--) if (hav(t[k], t[t.length - 1]) > 8) return bearing(t[k], t[t.length - 1]); if (T.route) { const c = T.route.coords; return bearing(c[T.ri], c[Math.min(c.length - 1, T.ri + 3)]); } return null; }
 function drawLive() {
-  if (!lMap) { lMap = mkMap('liveMap'); }
+  if (!lMap) { lMap = mkMap('liveMap'); lMap.on('dragstart', () => { if (T) { T.follow = false; $('#recenter').hidden = false; } }); }
   setTimeout(() => lMap.invalidateSize(), 30);
-  if (T.route && !lLayers.route) { lLayers.route = L.polyline(T.route.coords, { color: '#5A615B', weight: 5 }).addTo(lMap); }
-  if (!lLayers.trail) lLayers.trail = L.polyline([], { color: AC, weight: 5 }).addTo(lMap);
-  lLayers.trail.setLatLngs(T.trail);
-  const p = T.last ? T.last.p : (T.route ? T.route.coords[0] : lastFix);
+  const r = T.route;
+  if (r) {
+    if (!lLayers.done) { lLayers.done = L.polyline([], { color: '#8A918A', weight: 6, opacity: .7 }).addTo(lMap); lLayers.casing = L.polyline([], { color: '#0C2340', weight: 11, opacity: .35 }).addTo(lMap); lLayers.left = L.polyline([], { color: AC, weight: 7 }).addTo(lMap); lLayers.end = L.marker(r.coords[r.coords.length - 1], { icon: pinIcon('#FF9A5C'), interactive: false }).addTo(lMap); }
+    const ri = Math.min(T.ri, r.coords.length - 1), here = T.last ? T.last.p : r.coords[ri];
+    lLayers.done.setLatLngs(r.coords.slice(0, ri + 1).concat([here]));
+    const rest = [here].concat(r.coords.slice(ri + 1)); lLayers.left.setLatLngs(rest); lLayers.casing.setLatLngs(rest);
+    const nx = r.steps.find(s => s.i > T.ri && s.type !== 11);
+    if (nx) { if (!lLayers.turn) lLayers.turn = L.marker(r.coords[nx.i], { icon: L.divIcon({ className: '', html: '<div class="navturn"></div>', iconSize: [14, 14] }), interactive: false }).addTo(lMap); else lLayers.turn.setLatLng(r.coords[nx.i]); }
+    else if (lLayers.turn) { lMap.removeLayer(lLayers.turn); lLayers.turn = null; }
+  } else {
+    if (!lLayers.trail) lLayers.trail = L.polyline([], { color: AC, weight: 6 }).addTo(lMap);
+    lLayers.trail.setLatLngs(T.trail);
+  }
+  const p = T.last ? T.last.p : (r ? r.coords[0] : lastFix);
   if (!p) return;
-  if (!lLayers.you) lLayers.you = L.marker(p, { icon: youIcon(), interactive: false }).addTo(lMap); else lLayers.you.setLatLng(p);
-  lMap.setView(p, Math.max(lMap.getZoom() || 0, 16), { animate: false });
+  if (!lLayers.you) lLayers.you = L.marker(p, { icon: navIcon(), interactive: false, zIndexOffset: 1000 }).addTo(lMap); else lLayers.you.setLatLng(p);
+  const h = heading(), a = document.getElementById('navArrow'); if (a) a.style.transform = h == null ? '' : 'rotate(' + Math.round(h) + 'deg)';
+  const tm = T.mode && T.mode !== 'dist';
+  $('#ncMi').textContent = (T.goalHit || tm ? T.mi : Math.max(0, T.goal - T.mi)).toFixed(2);
+  $('#ncSub').textContent = T.goalHit || tm ? 'mi' : 'mi to go';
+  if (T.follow !== false) {
+    const z = Math.max(lMap.getZoom() || 0, 17), sz = lMap.getSize();
+    const c = lMap.unproject(lMap.project(p, z).subtract([0, sz.y * 0.18]), z);
+    lMap.setView(c, z, { animate: !!lLayers.you._moved }); lLayers.you._moved = 1;
+  }
 }
-$('#viewTog').onclick = () => { if (!T) return; T.mapMode = !T.mapMode; $('#s-live').classList.toggle('mapmode', T.mapMode); $('#viewTog').setAttribute('aria-label', T.mapMode ? 'Show progress ring' : 'Show map'); render(); };
+$('#recenter').onclick = () => { if (!T) return; T.follow = true; $('#recenter').hidden = true; drawLive(); };
+$('#viewTog').onclick = () => { if (!T) return; T.mapMode = !T.mapMode; T.follow = true; $('#recenter').hidden = true; $('#s-live').classList.toggle('mapmode', T.mapMode); $('#viewTog').setAttribute('aria-label', T.mapMode ? 'Show progress ring' : 'Show map'); render(); };
 $('#pause').onclick = () => { if (!T || !T.running) return; T.paused = !T.paused; T.auto = false; T.lastTick = Date.now(); T.lastMove = Date.now(); say(T.paused ? 'Paused.' : 'Resumed.'); render(); };
 $('#discard').onclick = () => {
   const b = $('#discard');
@@ -1166,7 +1204,7 @@ function doFinish() {
   f.addEventListener('contextmenu', e => e.preventDefault());
 }
 function thin(a, n) { if (a.length <= n) return a.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); const k = a.length / n, o = []; for (let i = 0; i < n; i++) o.push(a[Math.floor(i * k)]); o.push(a[a.length - 1]); return o.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); }
-function endSession() { if (pkOn) pocketOff(); if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} lLayers.route && lMap.removeLayer(lLayers.route); lLayers.trail && lMap.removeLayer(lLayers.trail); lLayers = {}; route = null; T = null; }
+function endSession() { if (pkOn) pocketOff(); if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} if (lMap) Object.values(lLayers).forEach(l => { try { lMap.removeLayer(l); } catch {} }); lLayers = {}; route = null; T = null; }
 
 /* ---------- done ---------- */
 $('#dDone').onclick = () => go(detailId ? 'you' : 'home');
