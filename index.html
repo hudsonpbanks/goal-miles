@@ -728,7 +728,7 @@ $('#pBest').onclick = () => { const b = bestPaceFor(S.act, S.goal); if (!b) retu
 
 /* ---------- settings ---------- */
 function openSettings() { $('#nm').value = S.name || ''; $('#wkg').value = S.weekGoal || ''; renderSwatches(); $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
-function closeSettings() { S.name = $('#nm').value.trim().slice(0, 24); S.weekGoal = parseFloat($('#wkg').value) || 0; S.wt = parseFloat($('#wt').value) || 0; S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); if (cur === 'you') renderYou(); if (cur === 'home') renderHome(); }
+function closeSettings() { S.name = $('#nm').value.trim().slice(0, 24); S.weekGoal = parseFloat($('#wkg').value) || 0; { const w = parseFloat($('#wt').value); S.wt = w >= 60 && w <= 600 ? w : 0; } S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); if (cur === 'you') renderYou(); if (cur === 'home') renderHome(); }
 
 $('#setClose').onclick = closeSettings;
 $('#settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
@@ -1098,7 +1098,7 @@ function showDone(r, prev, detail) {
   $('#dDel').hidden = !detail; $('#dDone').textContent = detail ? 'Back' : 'Done';
   $('#dCheck').style.display = detail ? 'none' : '';
   const d = new Date(r.date), h = d.getHours();
-  $('#dWhen').textContent = d.toLocaleDateString([], { weekday: 'short' }) + ' · ' + (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' ' + LABEL[r.act];
+  $('#dWhen').textContent = d.toLocaleDateString([], { weekday: 'short' }) + ' · ' + partOfDay(h) + ' ' + LABEL[r.act];
   $('#dCheck').className = 'check pop' + (r.hit ? '' : ' miss');
   $('#dCheck').innerHTML = r.hit ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : ringSvg(r.mi / r.goal, 88, 9);
   $('#dHead').textContent = r.hit ? 'Goal reached' : Math.round(r.mi / r.goal * 100) + '% of goal';
@@ -1386,7 +1386,7 @@ function renderOnb() {
   e.innerHTML = top + body;
   if (ob.shown === st) e.querySelector('.ob-step').style.animation = 'none'; ob.shown = st;
   const grab = () => { if ($('#obNm')) ob.name = $('#obNm').value; if ($('#obFt')) { ob.ft = +$('#obFt').value; ob.inch = +$('#obIn').value; ob.wt = $('#obWt').value.replace(/[^0-9.]/g, ''); ob.age = $('#obAge').value.replace(/[^0-9]/g, ''); } if ($('#obMile')) ob.mile = $('#obMile').value; };
-  $('#obNext').onclick = () => { grab(); if (st === n) return finishOnb(true); ob.step++; renderOnb(); e.scrollTo(0, 0); };
+  $('#obNext').onclick = () => { if ($('#obWt')) { const w = $('#obWt').value.trim(), a = $('#obAge').value.trim(); if (w && !(/^\d+(\.\d+)?$/.test(w) && +w >= 60 && +w <= 600)) return toast('Weight should be 60–600 lb, or leave it blank'); if (a && !(/^\d+$/.test(a) && +a >= 10 && +a <= 100)) return toast('Age should be 10–100, or leave it blank'); } grab(); if (st === n) return finishOnb(true); ob.step++; renderOnb(); e.scrollTo(0, 0); };
   if ($('#obBack')) $('#obBack').onclick = () => { grab(); ob.step--; renderOnb(); };
   if ($('#obSkip')) $('#obSkip').onclick = () => finishOnb(false);
   e.querySelectorAll('[data-act]').forEach(b => b.onclick = () => { ob.act = b.dataset.act; renderOnb(); });
