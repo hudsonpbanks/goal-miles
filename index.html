@@ -341,6 +341,13 @@ button:disabled{opacity:.4;cursor:default}
 .empty{display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:22px;background:var(--hi);border:1px solid var(--hib)}
 .empty b{font:700 26px/1.05 var(--cond)}
 .empty span{font-size:14.5px;line-height:1.5;color:var(--hit)}
+#pocket{position:fixed;inset:0;z-index:3500;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;touch-action:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+#pocket[hidden]{display:none}
+.pk-in{display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform 1.2s ease}
+.pk-in b{font:700 96px/1 var(--cond);color:#3C3F3D;font-variant-numeric:tabular-nums}
+.pk-l,.pk-s{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#2E302F}
+.pk-hint{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 34px);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#2E302F;transition:transform 120ms linear,opacity 120ms linear}
+#pocket.drag .pk-hint{color:#6A6E6B}
 #onb{position:fixed;inset:0;z-index:4500;margin:0 auto;max-width:480px;background:var(--bg);display:flex;flex-direction:column;gap:18px;padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto}
 .ob-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
 .ob-dots{display:flex;gap:6px}
@@ -480,6 +487,7 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
     <div class="row"><span class="dot" id="lDot"></span><span class="lbl" id="lStatus" style="color:var(--mu2)">Walking</span></div>
     <div class="row">
       <span class="chip" id="gps"><i></i><span>GPS</span></span>
+      <button class="ib" id="pkBtn" aria-label="Pocket mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
       <button class="ib" id="viewTog" aria-label="Show map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></button>
     </div>
   </div>
@@ -584,6 +592,10 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
 </nav>
 <div class="count" id="count" aria-live="assertive"><b id="countN">3</b><span class="lbl" id="countMsg">Finding GPS…</span></div>
 <div id="onb" role="dialog" aria-modal="true" aria-label="Pace setup" hidden></div>
+<div id="pocket" role="dialog" aria-modal="true" aria-label="Pocket mode. Swipe up to unlock." hidden>
+  <div class="pk-in" id="pkIn"><span class="pk-l" id="pkLbl">Miles to go</span><b id="pkLeft">0.00</b><span class="pk-s" id="pkSub"></span></div>
+  <div class="pk-hint" id="pkHint"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>Swipe up to unlock</div>
+</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1000,6 +1012,7 @@ function gpsChip() {
   c.lastElementChild.textContent = S.demo ? 'Demo GPS' : a == null ? 'Finding GPS' : a <= 15 ? 'GPS strong' : a <= 35 ? 'GPS okay' : 'GPS weak';
 }
 function render() {
+  if (pkOn) pocketRender();
   if (!T || cur !== 'live') return;
   const left = Math.max(0, T.goal - T.mi), pct = Math.min(1, T.mi / T.goal);
   $('#prog').setAttribute('stroke-dashoffset', RC * (1 - pct));
@@ -1067,7 +1080,7 @@ function doFinish() {
   f.addEventListener('contextmenu', e => e.preventDefault());
 }
 function thin(a, n) { if (a.length <= n) return a.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); const k = a.length / n, o = []; for (let i = 0; i < n; i++) o.push(a[Math.floor(i * k)]); o.push(a[a.length - 1]); return o.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); }
-function endSession() { if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} lLayers.route && lMap.removeLayer(lLayers.route); lLayers.trail && lMap.removeLayer(lLayers.trail); lLayers = {}; route = null; T = null; }
+function endSession() { if (pkOn) pocketOff(); if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} lLayers.route && lMap.removeLayer(lLayers.route); lLayers.trail && lMap.removeLayer(lLayers.trail); lLayers = {}; route = null; T = null; }
 
 /* ---------- done ---------- */
 $('#dDone').onclick = () => go(detailId ? 'you' : 'home');
@@ -1517,6 +1530,32 @@ async function shareCard(r) {
   try { if (navigator.canShare && navigator.canShare({ files: [file] })) return await navigator.share({ files: [file], text: r.mi.toFixed(2) + ' mi ' + LABEL[r.act] + ' with Goal Miles' }); } catch (e) { if (e.name === 'AbortError') return; }
   const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 5000); toast('Share card saved');
 }
+
+
+/* ---------- pocket mode ---------- */
+let pkOn = false, pkY = null, pkMove = 0;
+function pocketOn() {
+  if (!T) return; pkOn = true; $('#pocket').hidden = false; keepAwake(); pocketRender();
+  if (!pocketOn.told) { pocketOn.told = 1; say('Pocket mode on. Swipe up to unlock.'); }
+}
+function pocketOff() { pkOn = false; $('#pocket').hidden = true; $('#pocket').classList.remove('drag'); $('#pkHint').style.transform = ''; render(); }
+function pocketRender() {
+  if (!pkOn || !T) return;
+  const left = Math.max(0, T.goal - T.mi);
+  $('#pkLbl').textContent = T.goalHit ? 'Total miles' : T.paused ? 'Paused' : T.auto ? 'Auto-paused' : 'Miles to go';
+  $('#pkLeft').textContent = (T.goalHit ? T.mi : left).toFixed(2);
+  $('#pkSub').textContent = mmss(T.active) + '  ·  ' + rateTxt(T.act, T.active, T.mi);
+  const m = Math.floor(Date.now() / 60000) % 6;
+  $('#pkIn').style.transform = 'translate(' + [0, 14, -14, 10, -10, 0][m] + 'px,' + [0, -40, 30, 50, -30, 20][m] + 'px)';
+}
+$('#pkBtn').onclick = pocketOn;
+const pk = $('#pocket');
+pk.addEventListener('pointerdown', e => { pkY = e.clientY; pkMove = 0; pk.setPointerCapture && pk.setPointerCapture(e.pointerId); pk.classList.add('drag'); });
+pk.addEventListener('pointermove', e => { if (pkY == null) return; pkMove = Math.max(0, pkY - e.clientY); $('#pkHint').style.transform = 'translateY(' + (-Math.min(pkMove, 200) * 0.6) + 'px)'; });
+const pkEnd = () => { if (pkY == null) return; const need = innerHeight * 0.35; pkY = null; pk.classList.remove('drag'); $('#pkHint').style.transform = ''; if (pkMove >= need) pocketOff(); };
+pk.addEventListener('pointerup', pkEnd); pk.addEventListener('pointercancel', pkEnd);
+pk.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => { if (pkOn && e.key === 'Escape') pocketOff(); });
 
 /* ---------- resume after reload ---------- */
 (function resume() {
