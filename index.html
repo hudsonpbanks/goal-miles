@@ -12,10 +12,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/BarlowCondensed-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/Barlow-400.woff2) format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/Barlow-500.woff2) format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/Barlow-600.woff2) format('woff2')}@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/Barlow-700.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/BarlowCondensed-500.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/BarlowCondensed-600.woff2) format('woff2')}@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/BarlowCondensed-700.woff2) format('woff2')}
 :root{--ease-out:cubic-bezier(0.23,1,0.32,1);--ease-io:cubic-bezier(0.77,0,0.175,1);--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--warn:#FFB020;--cond:'Barlow Condensed',sans-serif}
 :root,[data-theme=ember]{--ac:#FF6B3D;--onac:#170803;--hi:#24130C;--hib:#4E2414;--hit:#EBC3B2;--acs:rgba(255,107,61,.22)}
 [data-theme=glacier]{--ac:#5B9DFF;--onac:#040A16;--hi:#0F1A2B;--hib:#203D68;--hit:#BCD0EE;--acs:rgba(91,157,255,.22)}
@@ -24,7 +24,7 @@
 [stroke="#D6F94B"]{stroke:var(--ac)}[fill="#D6F94B"]{fill:var(--ac)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-#s-setup .cta{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom) - 18px);margin:0 -20px calc(-1 * env(safe-area-inset-bottom) - 18px);padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(to bottom,rgba(12,14,13,0),var(--bg) 14px);z-index:5}
+#s-setup .cta{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom) - 18px);margin:0 -20px calc(-1 * env(safe-area-inset-bottom) - 18px);padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(to bottom,transparent,var(--bg) 14px);z-index:5}
 .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.82) contrast(.9) saturate(.35)}
 .pacer .best{white-space:nowrap}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:Barlow,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior:none}
@@ -44,7 +44,7 @@ button:disabled{opacity:.4;cursor:default}
 .ib{width:44px;height:44px;flex-shrink:0;border-radius:22px;border:none;background:var(--s1);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--tx)}
 .ib svg,.rb svg{width:20px;height:20px}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;background:var(--s1);border-radius:14px;padding:4px}
-.seg button{height:42px;border-radius:11px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
+.seg button{height:46px;border-radius:11px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
 .seg button[aria-checked=true]{background:var(--s3);color:var(--tx)}
 .stepper{display:flex;align-items:center;justify-content:space-between}
 .rb{width:64px;height:64px;flex-shrink:0;border-radius:32px;border:1.5px solid var(--line2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--tx);text-decoration:none}
@@ -53,23 +53,23 @@ button:disabled{opacity:.4;cursor:default}
 .goal{display:flex;flex-direction:column;align-items:center}
 .goal .num{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .goal .num{touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:text}
-#goalIn::selection{background:var(--acs);color:#F3F4EF}
+#goalIn::selection{background:var(--acs);color:var(--tx)}
 #goalIn{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;text-align:center;background:transparent;border:none;border-bottom:3px solid var(--ac);border-radius:0;color:var(--tx);padding:0;margin:0;outline:none;caret-color:var(--ac);max-width:62vw;font-variant-numeric:tabular-nums}
 .lbl{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
 .muted{color:var(--mu)}
 .eta{text-align:center;margin:-4px 0 0;font-size:14px;color:var(--mu)}
 .eta b{color:var(--tx)}
 .chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.chips button{height:36px;padding:0 14px;border-radius:18px;border:1.5px solid var(--s3);background:transparent;color:var(--mu2);font-size:14px;font-weight:600}
+.chips button{height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--s3);background:transparent;color:var(--mu2);font-size:14px;font-weight:600}
 .chips button[aria-pressed=true]{border-color:var(--ac);color:var(--ac)}
 .card{background:var(--s1);border-radius:18px}
 .list{padding:2px 16px}
-.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.opt{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .opt:last-child{border-bottom:none}
 .opt .t{display:flex;flex-direction:column;gap:2px;min-width:0}
 .opt .t b{font-size:15px;font-weight:600}
 .opt .t span{font-size:13px;color:var(--mu)}
-.sw{flex-shrink:0;width:52px;height:32px;border-radius:16px;border:none;padding:3px;background:var(--line2);display:flex;justify-content:flex-start}
+.sw{position:relative;flex-shrink:0;width:52px;height:32px;border-radius:16px;border:none;padding:3px;background:var(--line2);display:flex;justify-content:flex-start}
 .sw::after{content:"";width:26px;height:26px;border-radius:13px;background:var(--mu);transition:transform .2s}
 .sw[aria-checked=true]{background:var(--ac)}
 .sw[aria-checked=true]::after{background:var(--onac);transform:translateX(20px)}
@@ -87,17 +87,17 @@ button:disabled{opacity:.4;cursor:default}
 .pill .t b{font-size:14px}
 .pill .t span{font-size:12.5px;color:var(--hit)}
 .pill button{width:36px;height:36px;border-radius:18px;border:none;background:transparent;color:var(--mu2)}
-.map{position:relative;height:300px;flex-shrink:0;border-radius:22px;overflow:hidden;background:#111412}
-.map .leaflet-container{background:#111412;height:100%}
-.ov{position:absolute;z-index:500;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:17px;background:rgba(12,14,13,.9);font-size:14px;font-weight:600}
+.map{position:relative;height:300px;flex-shrink:0;border-radius:22px;overflow:hidden;background:var(--map)}
+.map .leaflet-container{background:var(--map);height:100%}
+.ov{position:absolute;z-index:500;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:17px;background:var(--glass);font-size:14px;font-weight:600}
 .ov b{font-family:var(--cond);font-size:19px}
 .leaflet-control-attribution{background:rgba(12,14,13,.7)!important;color:var(--mu)!important;font-size:10px!important}
 .leaflet-control-attribution a{color:var(--mu2)!important}
 .dist{display:flex;align-items:center;gap:12px;padding:6px 8px 6px 14px;border-radius:16px;background:var(--s1)}
-.dist .lbl{font-size:11px}
+.dist .lbl{font-size:12.5px}
 #rRange{flex:1;min-width:0;height:44px;margin:0;accent-color:var(--ac);background:transparent}
 .dbox{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--mu)}
-#rDist{width:4.2ch;height:44px;padding:0 6px;border-radius:10px;border:1.5px solid var(--line2);background:var(--bg);color:var(--tx);text-align:center;font:600 22px var(--cond);font-variant-numeric:tabular-nums}
+#rDist{width:56px;height:44px;padding:0 6px;border-radius:10px;border:1.5px solid var(--line2);background:var(--bg);color:var(--tx);text-align:center;font:600 22px var(--cond);font-variant-numeric:tabular-nums}
 #rDist:focus{border-color:var(--ac);outline:none}
 #rMapBox{height:260px}
 .routes{display:flex;flex-direction:column;gap:8px}
@@ -128,8 +128,8 @@ button:disabled{opacity:.4;cursor:default}
 .banner .t{display:flex;flex-direction:column;gap:1px;min-width:0}
 .banner .t b{font-size:15px}
 .banner .t span{font-size:13px;color:var(--hit)}
-.banner.warn{background:#2A1A10;border-color:#5A3218}
-.banner.warn .t span{color:#D9B9A6}
+.banner.warn{background:var(--wbg);border-color:var(--wbd)}
+.banner.warn .t span{color:var(--wtx)}
 .banner.gb{background:var(--ac);border-color:var(--ac);color:var(--onac)}
 .banner.gb .t span{color:var(--onac);opacity:.78}
 .turn{display:none;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:var(--s1)}
@@ -141,7 +141,7 @@ button:disabled{opacity:.4;cursor:default}
 .turn .t span{font-size:14px;color:var(--mu2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .stat{display:flex;flex-direction:column;gap:4px;padding:14px 12px;border-radius:16px;background:var(--s1)}
-.stat .lbl{font-size:11px;letter-spacing:.12em}
+.stat .lbl{font-size:12.5px;letter-spacing:.1em;color:var(--mu2)}
 .stat b{font-family:var(--cond);font-weight:600;font-size:28px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ctrl{display:flex;align-items:center;justify-content:center;gap:28px}
 .play{width:96px;height:96px;border-radius:48px;border:none;background:var(--ac);color:var(--onac);display:flex;align-items:center;justify-content:center}
@@ -150,7 +150,7 @@ button:disabled{opacity:.4;cursor:default}
 #liveMap{display:none;height:auto;flex:1 1 280px;min-height:240px}
 .mapmode #liveMap{display:block}
 .mapmode .ring{display:none}
-.count{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(12,14,13,.96)}
+.count{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:var(--bg)}
 .count.on{display:flex}
 .count b{font-family:var(--cond);font-weight:700;font-size:200px;line-height:1;color:var(--ac)}
 @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
@@ -161,7 +161,7 @@ button:disabled{opacity:.4;cursor:default}
 .splits{display:flex;flex-direction:column;gap:12px;padding:16px}
 .sp{display:grid;grid-template-columns:58px minmax(0,1fr) 56px;align-items:center;gap:12px;font-size:14px}
 .sp .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
-.sp .bar i{display:block;height:100%;border-radius:5px;background:#6F766F}
+.sp .bar i{display:block;height:100%;border-radius:5px;background:var(--bar)}
 .sp .bar i.f{background:var(--ac)}
 .sp b{font-family:var(--cond);font-weight:600;font-size:20px;text-align:right;font-variant-numeric:tabular-nums}
 .badges{display:flex;gap:8px}
@@ -178,7 +178,7 @@ button:disabled{opacity:.4;cursor:default}
 .seg.sm button{height:34px;font-size:13px}
 .cal{padding:16px;display:flex;flex-direction:column;gap:12px}
 .calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
-.calg em{font-style:normal;font-size:11px;font-weight:600;color:var(--mu);padding-bottom:4px}
+.calg em{font-style:normal;font-size:12.5px;font-weight:600;color:var(--mu);padding-bottom:4px}
 .calg span{position:relative;height:38px;display:flex;align-items:center;justify-content:center}
 .calg span i{position:absolute;border-radius:50%;background:var(--ac);opacity:.9}
 .calg span b{position:relative;font-size:12.5px;font-weight:600;color:var(--mu2)}
@@ -189,8 +189,8 @@ button:disabled{opacity:.4;cursor:default}
 .chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;height:132px}
 .chart div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
 .chart i{display:block;width:100%;border-radius:6px;background:var(--line)}
-.chart i.v{background:#6F766F}.chart i.today{background:var(--ac)}
-.chart span{font-size:11px;font-weight:600;color:var(--mu2);font-variant-numeric:tabular-nums;min-height:13px}
+.chart i.v{background:var(--bar)}.chart i.today{background:var(--ac)}
+.chart span{font-size:12.5px;font-weight:600;color:var(--mu2);font-variant-numeric:tabular-nums;min-height:13px}
 .chart em{font-style:normal;font-size:12px;font-weight:600;color:var(--mu)}
 .chart em.today{color:var(--ac)}
 .kv{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--mu2)}
@@ -213,14 +213,14 @@ button:disabled{opacity:.4;cursor:default}
 .small{font-size:13px;color:var(--mu);line-height:1.45}
 .small a{color:var(--ac)}
 .danger{height:48px;border-radius:12px;border:1.5px solid #5A3218;background:transparent;color:var(--warn);font-weight:600;font-size:15px}
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 110px);transform:translateX(-50%) translateY(20px);z-index:4000;padding:12px 18px;border-radius:14px;background:#F3F4EF;color:#0C0E0D;font-weight:600;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 110px);transform:translateX(-50%) translateY(20px);z-index:4000;padding:12px 18px;border-radius:14px;background:var(--tx);color:var(--bg);font-weight:600;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
 .you{width:18px;height:18px;border-radius:9px;background:#F3F4EF;border:3px solid #0C0E0D;box-shadow:0 0 0 8px var(--acs)}
 .pin{width:16px;height:16px;border-radius:8px;border:3px solid #0C0E0D}
 .mk{min-width:26px;height:26px;padding:0 4px;border-radius:13px;background:#0C0E0D;border:2px solid var(--ac);color:var(--tx);font:700 13px/22px var(--cond);text-align:center}
 .spd{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px 14px;gap:8px}
 .spd div{display:flex;flex-direction:column;gap:2px}
-.spd small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.spd small{font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
 .spd b{font-family:var(--cond);font-weight:600;font-size:24px;font-variant-numeric:tabular-nums}
 .spd em{font-style:normal;font-size:14px;color:var(--mu);margin-left:3px}
 .spd .now{color:var(--ac)}
@@ -234,7 +234,7 @@ button:disabled{opacity:.4;cursor:default}
 .pbar i{display:block;height:100%;border-radius:4px;background:var(--ac)}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .kpis div{display:flex;flex-direction:column;gap:2px}
-.kpis small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.kpis small{font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
 .kpis b{font-family:var(--cond);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
 .wo{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
 .wo .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -244,13 +244,13 @@ button:disabled{opacity:.4;cursor:default}
 .tip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}
 .pred{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .pred div{display:flex;flex-direction:column;gap:2px;padding:12px 10px;border-radius:14px;background:var(--bg)}
-.pred small{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.pred small{font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
 .pred b{font-family:var(--cond);font-weight:600;font-size:21px;font-variant-numeric:tabular-nums}
 .ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 16px 16px}
 .ach div{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;background:var(--bg);text-align:center}
 .ach svg{width:26px;height:26px}
 .ach b{font-size:12.5px;line-height:1.2}
-.ach span{font-size:11px;color:var(--mu)}
+.ach span{font-size:12.5px;color:var(--mu)}
 .ach .lk{opacity:.35}
 .sel{display:flex;flex-wrap:wrap;gap:8px}
 .sel button{height:40px;padding:0 14px;border-radius:20px;border:1.5px solid var(--line2);background:transparent;font-weight:600;font-size:14px;color:var(--mu2)}
@@ -261,9 +261,9 @@ button:disabled{opacity:.4;cursor:default}
 .wx.warn{color:var(--warn)}
 .pacer .best{height:32px;padding:0 10px;border-radius:16px;border:1.5px solid var(--line2);background:transparent;font-size:12.5px;font-weight:600;color:var(--mu2);margin-left:4px;width:auto!important}
 .screen.tabbed{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)}
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;margin:0 auto;max-width:480px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;padding:8px 10px calc(env(safe-area-inset-bottom) + 8px);background:linear-gradient(to bottom,rgba(12,14,13,.0),rgba(12,14,13,.92) 22%,#0C0E0D 60%)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;margin:0 auto;max-width:480px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;padding:8px 10px calc(env(safe-area-inset-bottom) + 8px);background:linear-gradient(to bottom,transparent,var(--bg) 40%)}
 .tabbar[hidden]{display:none}
-.tabbar button{height:54px;border:none;background:transparent;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.tabbar button{height:54px;border:none;background:transparent;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;letter-spacing:.02em}
 .tabbar button svg{width:24px;height:24px}
 .tabbar button[aria-current=page]{color:var(--tx)}
 .tabbar button[aria-current=page] svg{color:var(--ac)}
@@ -292,7 +292,7 @@ button:disabled{opacity:.4;cursor:default}
 .wk .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .wk .t b{font:700 30px/1 var(--cond);font-variant-numeric:tabular-nums}
 .wk .t b small{font-size:16px;color:var(--mu);font-weight:600;margin-left:4px}
-.wk .mini{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:16px;font-size:11.5px;color:var(--mu)}
+.wk .mini{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:16px;font-size:12.5px;color:var(--mu)}
 .wk .mini span{display:flex;flex-direction:column;gap:1px}
 .wk .mini b{font:600 17px var(--cond);color:var(--tx)}
 .sh{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
@@ -313,7 +313,7 @@ button:disabled{opacity:.4;cursor:default}
 .tot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .tot div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px;border-radius:16px;background:var(--s1)}
 .tot b{font:700 26px var(--cond);font-variant-numeric:tabular-nums}
-.tot small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.tot small{font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
 .lvl{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:18px;background:var(--s1)}
 .lvl .row{justify-content:space-between;font-size:14px;color:var(--mu2)}
 .lvl b{color:var(--tx)}
@@ -353,7 +353,7 @@ button:disabled{opacity:.4;cursor:default}
 .ob-dots{display:flex;gap:6px}
 .ob-dots i{width:22px;height:4px;border-radius:2px;background:var(--line2)}
 .ob-dots i.on{background:var(--ac)}
-.ob-skip{height:44px;padding:0 6px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
+.ob-skip{height:44px;padding:0 12px;margin-right:-6px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
 .ob-step{display:flex;flex-direction:column;gap:14px;animation:obIn 280ms var(--ease-out) both}
 @keyframes obIn{from{opacity:0;transform:translateY(12px)}}
 .ob-step h1{margin:0;font:700 40px/1 var(--cond);letter-spacing:.01em;text-transform:uppercase}
@@ -405,6 +405,18 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
 @keyframes spLift{to{transform:translateY(-12px) scale(.98)}}
 @keyframes spOut{to{opacity:0;visibility:hidden}}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
+
+:root{--map:#111412;--glass:rgba(12,14,13,.9);--wbg:#2A1A10;--wbd:#5A3218;--wtx:#D9B9A6;--bar:#6F766F}
+[data-mode=light]{color-scheme:light;--bg:#F3F4F0;--s1:#FFFFFF;--s2:#E9ECE7;--s3:#DDE1DB;--line:#E1E4DE;--line2:#C6CCC5;--tx:#111412;--mu:#545A54;--mu2:#2F342F;--warn:#B45F00;--map:#E4E7E2;--glass:rgba(255,255,255,.92);--wbg:#FFF1E2;--wbd:#F0C79A;--wtx:#6B3A0E;--bar:#9AA29A}
+[data-mode=light][data-theme=ember],[data-mode=light]:not([data-theme]){--ac:#E4522A;--onac:#FFFFFF;--hi:#FFEDE5;--hib:#F7C6B2;--hit:#7A2A10}
+[data-mode=light][data-theme=glacier]{--ac:#2F6FD6;--onac:#FFFFFF;--hi:#E7F0FF;--hib:#B9D1F7;--hit:#173E7A}
+[data-mode=light][data-theme=mint]{--ac:#0E9C70;--onac:#FFFFFF;--hi:#E2F7EF;--hib:#A9E3CE;--hit:#0B4D38}
+[data-mode=light][data-theme=volt]{--ac:#6E8F00;--onac:#FFFFFF;--hi:#F1F8D8;--hib:#D3E79A;--hit:#3B4D00}
+[data-mode=light] .leaflet-tile-pane{filter:saturate(.6) contrast(.95)}
+[data-mode=light] .leaflet-control-attribution{background:rgba(255,255,255,.8)!important}
+.rb.lim{opacity:.35}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#hmCoach{display:inline-block;padding:12px 4px;margin:-12px -4px}
 @media (prefers-reduced-motion:reduce){
 *:not(#splash){transition:none!important;animation:none!important}
 .sp-arc{stroke-dashoffset:16.67}.sp-dot{opacity:1;transform:rotate(300deg)}.sp-word i{transform:none}.sp-tag{opacity:1;transform:none}
@@ -427,7 +439,7 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
 <section class="screen" id="s-setup" aria-label="New workout">
   <div class="top">
     <button class="ib" id="recClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <div class="title"><b>New workout</b><span>Double-tap the number to type it</span></div>
+    <div class="title"><b>New workout</b><span>Double-tap the number to type</span></div>
     <span style="width:44px"></span>
   </div>
   <div class="seg" id="act" role="radiogroup" aria-label="Activity">
@@ -492,8 +504,8 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
     </div>
   </div>
   <div class="ring" id="ring">
-    <svg viewBox="0 0 320 320" role="img" id="ringSvg" aria-label="Progress"><circle cx="160" cy="160" r="144" fill="none" stroke="#1E221F" stroke-width="16"/><circle id="prog" cx="160" cy="160" r="144" fill="none" stroke="#D6F94B" stroke-width="16" stroke-linecap="round" stroke-dasharray="904.78" stroke-dashoffset="904.78" transform="rotate(-90 160 160)"/></svg>
-    <div class="c"><span class="lbl" id="lLeftLbl">Miles to go</span><span class="big" id="lLeft" aria-live="off">2.00</span><span class="muted" style="font-size:14px"><b style="color:var(--tx)" id="lDone">0.00</b> of <span id="lGoal">2</span> mi</span></div>
+    <svg viewBox="0 0 320 320" role="img" id="ringSvg" aria-label="Progress"><circle cx="160" cy="160" r="144" fill="none" style="stroke:var(--s2)" stroke-width="16"/><circle id="prog" cx="160" cy="160" r="144" fill="none" stroke="#D6F94B" stroke-width="16" stroke-linecap="round" stroke-dasharray="904.78" stroke-dashoffset="904.78" transform="rotate(-90 160 160)"/></svg>
+    <div class="c"><span class="lbl" id="lLeftLbl">Miles to go</span><span class="big" id="lLeft" aria-live="off">2.00</span><span class="sr" id="lLive" aria-live="polite"></span><span class="muted" style="font-size:14px"><b style="color:var(--tx)" id="lDone">0.00</b> of <span id="lGoal">2</span> mi</span></div>
   </div>
   <div class="map" id="liveMap"></div>
   <div class="turn" id="turn"><div class="ar" id="turnIc"></div><div class="t"><b id="turnD"></b><span id="turnT"></span></div></div>
@@ -573,6 +585,7 @@ body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!impor
   <div class="in">
     <div class="row" style="justify-content:space-between"><h2 id="setH">Settings</h2><button class="ib" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <div class="field"><label>Accent color</label><div class="swatches" id="swatches"></div></div>
+    <div class="field"><label id="modeL">Appearance</label><div class="seg" id="modeSeg" role="radiogroup" aria-labelledby="modeL"><button role="radio" data-v="dark">Dark</button><button role="radio" data-v="light">Light</button><button role="radio" data-v="auto">Auto</button></div><span class="small muted" style="font-size:13px;margin-top:6px;display:block">Light is easier to read in bright sun. Auto follows your phone.</span></div>
     <div class="ob-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="field"><label for="nm">First name</label><input id="nm" autocomplete="given-name" placeholder="Optional"></div><div class="field"><label for="wkg">Weekly target (mi)</label><input id="wkg" inputmode="decimal" placeholder="10"></div></div>
     <div class="field"><label for="orsKey">Route planner key (OpenRouteService)</label><input id="orsKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your free key"><p class="small" style="margin:0">Free at <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a>. Sign up, open Dashboard, copy the "Standard" key, paste it here. Stays on this phone.</p></div>
     <div class="field"><label for="wt">Your weight in lb (optional)</label><input id="wt" inputmode="numeric" placeholder="For calorie estimates"></div>
@@ -605,7 +618,8 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const M = 1609.344;
 let AC = '#FF6B3D';
 const THEMES = [['ember', 'Ember', '#FF6B3D'], ['glacier', 'Glacier', '#5B9DFF'], ['mint', 'Mint', '#3FE0AE'], ['volt', 'Volt', '#D6F94B']];
-function applyTheme() { document.documentElement.dataset.theme = S.theme || 'ember'; AC = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim() || AC; }
+const mq = matchMedia('(prefers-color-scheme: light)');
+function applyTheme() { const m = S.mode === 'light' || (S.mode === 'auto' && mq.matches) ? 'light' : 'dark'; document.documentElement.dataset.mode = m; const tc = document.querySelector('meta[name=theme-color]'); if (tc) tc.content = m === 'light' ? '#F3F4F0' : '#0C0E0D'; document.documentElement.dataset.theme = S.theme || 'ember'; AC = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim() || AC; }
 const LABEL = { walk: 'walk', run: 'run', bike: 'ride' };
 const VERB = { walk: 'Walking', run: 'Running', bike: 'Riding' };
 const MAXV = { walk: 4, run: 9, bike: 22 };
@@ -679,6 +693,7 @@ function renderSetup() {
   $$('#act button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === S.act));
   $('#goalNum').textContent = fmtG(S.goal);
   $('#goalUnit').textContent = S.goal === 1 ? 'mile' : 'miles';
+  $('#dec').classList.toggle('lim', S.goal <= 0.5); $('#inc').classList.toggle('lim', S.goal >= 100);
   const mins = Math.round(S.goal * S.pace[S.act] / 60);
   $('#eta').innerHTML = 'Est. <b>' + (mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min') + '</b> at ' + targetTxt(S.act);
   $$('#chips button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === S.goal));
@@ -694,8 +709,8 @@ function renderSetup() {
   if (route) { $('#rpName').textContent = route.name; $('#rpMeta').textContent = (route.m / M).toFixed(2) + ' mi · ' + route.typeLabel; }
 }
 $$('#act button').forEach(b => b.onclick = () => { S.act = b.dataset.v; save(); renderSetup(); });
-$('#dec').onclick = () => { S.goal = S.goal <= 1 ? 0.5 : Math.ceil(S.goal) - 1; save(); renderSetup(); };
-$('#inc').onclick = () => { S.goal = S.goal < 1 ? 1 : Math.min(100, Math.floor(S.goal) + 1); save(); renderSetup(); };
+$('#dec').onclick = () => { if (S.goal <= 0.5) return toast('Shortest goal is 0.5 mi'); S.goal = S.goal <= 1 ? 0.5 : Math.ceil(S.goal) - 1; save(); renderSetup(); };
+$('#inc').onclick = () => { if (S.goal >= 100) return toast('Longest goal is 100 mi'); S.goal = S.goal < 1 ? 1 : Math.min(100, Math.floor(S.goal) + 1); save(); renderSetup(); };
 let editing = false, lastTap = 0;
 const gIn = $('#goalIn'), gNum = $('#goalNum');
 const fitIn = () => { gIn.style.width = Math.max(1.6, gIn.value.length + 0.6) + 'ch'; };
@@ -708,6 +723,7 @@ function commitGoal(ok) {
   if (!editing) return; editing = false;
   if (ok) {
     const v = parseFloat(gIn.value.replace(',', '.'));
+    if (v > 100) toast('Longest goal is 100 mi');
     if (v > 0) { S.goal = Math.min(100, Math.max(0.1, Math.round(v * 100) / 100)); save(); }
     else if (gIn.value.trim()) toast('Enter a distance like 4.2');
   }
@@ -719,6 +735,7 @@ gIn.addEventListener('input', () => { const c = gIn.value.replace(/[^0-9.,]/g, '
 gIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); gIn.blur(); } else if (e.key === 'Escape') { commitGoal(false); } });
 gIn.addEventListener('blur', () => commitGoal(true));
 $$('#chips button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderSetup(); });
+document.addEventListener('click', e => { const o = e.target.closest('.opt'); if (o && !e.target.closest('button,a,input,select')) o.querySelector('.sw')?.click(); });
 $$('.sw[data-k]').forEach(b => b.onclick = () => { S[b.dataset.k] = !S[b.dataset.k]; save(); renderSetup(); });
 $('#pDec').onclick = () => { S.autoPace = false; if (S.act === 'bike') { S.pace.bike = Math.round(3600 / Math.max(4, 3600 / S.pace.bike - 0.5)); save(); return renderSetup(); } S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
 $('#pInc').onclick = () => { S.autoPace = false; if (S.act === 'bike') { S.pace.bike = Math.round(3600 / Math.min(35, 3600 / S.pace.bike + 0.5)); save(); return renderSetup(); } S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
@@ -727,7 +744,7 @@ $('#toRoute').onclick = () => go('route');
 $('#pBest').onclick = () => { const b = bestPaceFor(S.act, S.goal); if (!b) return toast('No past ' + LABEL[S.act] + 's near this distance yet'); S.pace[S.act] = Math.round(b); S.pacer = true; save(); renderSetup(); toast('Racing your best: ' + mmss(b) + ' /mi'); };
 
 /* ---------- settings ---------- */
-function openSettings() { $('#nm').value = S.name || ''; $('#wkg').value = S.weekGoal || ''; renderSwatches(); $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
+function openSettings() { $('#nm').value = S.name || ''; $('#wkg').value = S.weekGoal || ''; renderSwatches(); renderMode(); $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
 function closeSettings() { S.name = $('#nm').value.trim().slice(0, 24); S.weekGoal = parseFloat($('#wkg').value) || 0; { const w = parseFloat($('#wt').value); S.wt = w >= 60 && w <= 600 ? w : 0; } S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); if (cur === 'you') renderYou(); if (cur === 'home') renderHome(); }
 
 $('#setClose').onclick = closeSettings;
@@ -735,6 +752,8 @@ $('#settings').addEventListener('click', e => { if (e.target.id === 'settings') 
 $('#demoSw').onclick = () => { S.demo = !S.demo; save(); $('#demoSw').setAttribute('aria-checked', S.demo); toast(S.demo ? 'Demo mode on: fake GPS' : 'Demo mode off: real GPS'); };
 $('#clearHist').onclick = () => { if (!$('#clearHist').dataset.arm) { $('#clearHist').dataset.arm = 1; $('#clearHist').textContent = 'Tap again to delete everything'; setTimeout(() => { delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; }, 3000); return; } hist = []; store.set('hist', hist); toast('History cleared'); delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; };
 
+function renderMode() { $$('#modeSeg button').forEach(b => { b.setAttribute('aria-checked', b.dataset.v === (S.mode || 'dark')); b.onclick = () => { S.mode = b.dataset.v; save(); applyTheme(); renderMode(); }; }); }
+mq.addEventListener?.('change', () => S.mode === 'auto' && applyTheme());
 function renderSwatches() {
   $('#swatches').innerHTML = THEMES.map(([k, n, c]) => '<button data-th="' + k + '" aria-pressed="' + ((S.theme || 'ember') === k) + '"><i style="background:' + c + '"></i>' + n + '</button>').join('');
   $$('#swatches [data-th]').forEach(b => b.onclick = () => { S.theme = b.dataset.th; save(); applyTheme(); renderSwatches(); });
@@ -1018,6 +1037,7 @@ function render() {
   $('#prog').setAttribute('stroke-dashoffset', RC * (1 - pct));
   $('#ringSvg').setAttribute('aria-label', Math.round(pct * 100) + ' percent of goal');
   $('#lLeft').textContent = T.goalHit ? T.mi.toFixed(2) : left.toFixed(2);
+  { const k = T.goalHit ? 'Goal reached' : (Math.floor(left * 10) / 10).toFixed(1) + ' miles to go'; if ($('#lLive').textContent !== k) $('#lLive').textContent = k; }
   $('#lLeftLbl').textContent = T.goalHit ? 'Total miles' : 'Miles to go';
   $('#lDone').textContent = T.mi.toFixed(2);
   const st = !T.running ? 'Get ready' : T.paused ? 'Paused' : T.auto ? 'Auto-paused' : T.goalHit ? 'Goal reached' : VERB[T.act];
@@ -1156,6 +1176,7 @@ let renderHist = function () {
   $('#hChart').style.gridTemplateColumns = 'repeat(' + buckets.length + ',minmax(0,1fr))'; $('#hChart').style.gap = buckets.length > 8 ? '6px' : '10px';
   $('#hChart').innerHTML = buckets.map(x => '<div><span>' + (x.v ? (x.v >= 100 ? Math.round(x.v) : x.v.toFixed(1)) : '') + '</span><i class="' + (x.v ? 'v ' : '') + (x.now && x.v ? 'today' : '') + '" style="height:' + (x.v ? Math.max(8, Math.round(x.v / mx * 86)) : 4) + 'px"></i><em class="' + (x.now ? 'today' : '') + '">' + x.l + '</em></div>').join('');
   const tot = buckets.reduce((a, b) => a + b.v, 0);
+  $('#hChart').setAttribute('aria-label', { week: 'Last 7 days', month: 'Last 8 weeks', year: 'Last 12 months' }[hR] + ': ' + tot.toFixed(1) + ' miles');
   $('#hChartT').textContent = { week: 'Last 7 days', month: 'Last 8 weeks', year: 'Last 12 months' }[hR] + ' · ' + tot.toFixed(1) + ' mi';
   $$('#hRange button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === hR));
   $('#hChart').setAttribute('aria-label', 'Miles chart, ' + $('#hChartT').textContent);
@@ -1378,7 +1399,7 @@ function renderOnb() {
   const back = st > 0 ? '<button class="rb" id="obBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>' : '';
   const next = (t) => '<div class="ob-nav">' + back + '<button class="btn" id="obNext">' + t + '</button></div>';
   let body = '';
-  if (st === 0) body = '<div class="ob-step"><svg width="64" height="64" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="none" stroke="#262A27" stroke-width="9"/><circle cx="40" cy="40" r="30" fill="none" stroke="#D6F94B" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="33" transform="rotate(-90 40 40)"/></svg><h1>Let\'s find<br>your pace</h1><p>Four quick questions and Goal Miles sets a target pace that fits you, for walking, running and biking. It all stays on this phone.</p></div>' + next("Let's go");
+  if (st === 0) body = '<div class="ob-step"><svg width="64" height="64" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="none" style="stroke:var(--line)" stroke-width="9"/><circle cx="40" cy="40" r="30" fill="none" stroke="#D6F94B" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="33" transform="rotate(-90 40 40)"/></svg><h1>Let\'s find<br>your pace</h1><p>Four quick questions and Goal Miles sets a target pace that fits you, for walking, running and biking. It all stays on this phone.</p></div>' + next("Let's go");
   if (st === 1) body = '<div class="ob-step"><h1>What will you<br>do most?</h1><div role="radiogroup" aria-label="Main activity" style="display:flex;flex-direction:column;gap:10px">' + [['walk', 'Walk', 'Daily miles, steady pace'], ['run', 'Run', 'Jogs, 5Ks, training'], ['bike', 'Bike', 'Rides around town or longer']].map(([v, t, d]) => '<button class="ob-opt" role="radio" data-act="' + v + '" aria-checked="' + (ob.act === v) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div></div>' + next('Next');
   if (st === 2) body = '<div class="ob-step"><h1>About you</h1><p>Taller people stride longer and age and weight change your comfortable pace. Leave anything blank if you\'d rather not say.</p><div class="field"><label for="obNm">First name</label><input id="obNm" autocomplete="given-name" placeholder="Optional" value="' + (ob.name || '').replace(/"/g, '') + '"></div><div class="field"><label>Height</label><div class="ob-row"><select id="obFt" aria-label="Feet">' + [4, 5, 6, 7].map(v => '<option value="' + v + '"' + (v === ob.ft ? ' selected' : '') + '>' + v + ' ft</option>').join('') + '</select><select id="obIn" aria-label="Inches">' + Array.from({ length: 12 }, (_, v) => '<option value="' + v + '"' + (v === ob.inch ? ' selected' : '') + '>' + v + ' in</option>').join('') + '</select></div></div><div class="ob-row"><div class="field"><label for="obWt">Weight (lb)</label><input id="obWt" inputmode="numeric" placeholder="170" value="' + ob.wt + '"></div><div class="field"><label for="obAge">Age</label><input id="obAge" inputmode="numeric" placeholder="25" value="' + ob.age + '"></div></div></div>' + next('Next');
   if (st === 3) body = '<div class="ob-step"><h1>How active<br>are you now?</h1><div role="radiogroup" aria-label="Activity level" style="display:flex;flex-direction:column;gap:10px">' + LV.map(([t, d], i) => '<button class="ob-opt" role="radio" data-lvl="' + i + '" aria-checked="' + (ob.lvl === i) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div>' + (ob.act === 'run' ? '<div class="field"><label for="obMile">Recent mile time (optional)</label><input id="obMile" inputmode="numeric" placeholder="9:30" value="' + ob.mile + '"></div>' : '') + '</div>' + next('See my paces');
@@ -1420,15 +1441,16 @@ function level(tot) { let l = 0; while (l < LVLS.length - 1 && tot >= LVLS[l + 1
 function weekTarget() { const g = goals.find(x => x.type === 'week'); return S.weekGoal || (g && g.n) || { walk: 10, run: 15, bike: 40 }[S.act]; }
 function ringSvg(pct, size, sw) {
   const r = (size - sw) / 2, c = 2 * Math.PI * r;
-  return '<svg class="r" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#22262A" stroke-width="' + sw + '"/><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + AC + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - Math.min(1, pct))).toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/></svg>';
+  return '<svg class="r" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" style="stroke:var(--s3)" stroke-width="' + sw + '"/><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + AC + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - Math.min(1, pct))).toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/></svg>';
 }
 
 /* ---------- home ---------- */
+const avFill = el => { if (S.name) el.textContent = S.name.charAt(0).toUpperCase(); else el.innerHTML = '<svg viewBox="0 0 24 24" width="55%" height="55%" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'; };
 function renderHome() {
   const now = new Date(), h = now.getHours();
   $('#hmDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
   $('#hmHi').textContent = (h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + (S.name ? ', ' + S.name : '');
-  $('#hmAv').textContent = (S.name || 'G').charAt(0).toUpperCase();
+  avFill($('#hmAv'));
   const mins = Math.round(S.goal * S.pace[S.act] / 60);
   const est = mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min';
   const useRoute = route && route.act === S.act && Math.abs(route.goal - S.goal) < 0.001;
@@ -1437,9 +1459,10 @@ function renderHome() {
   if (S.pacer) chips.push('<span>Pacer ' + targetTxt(S.act) + '</span>');
   if (S.voice) chips.push('<span>Voice on</span>');
   if (S.outback) chips.push('<span>Out &amp; back</span>');
-  let html = '';
-  if (!hist.length) html += '<div class="empty"><b>Your first goal<br>starts here.</b><span>Pick a distance, hit start, and Goal Miles counts you down to it with GPS. No guessing where the mile marker is.</span></div>';
+  let html = '', promo = '';
+  if (!hist.length) promo = '<div class="empty"><b>Your first goal<br>starts here.</b><span>Pick a distance, hit start, and Goal Miles counts you down to it with GPS. No guessing where the mile marker is.</span></div>';
   html += '<div class="hero"><span class="k">Quick start</span><div class="big">' + fmtG(S.goal) + '<small>mi ' + LABEL[S.act] + '</small></div><div class="meta">About ' + est + ' at ' + targetTxt(S.act) + '</div>' + (chips.length ? '<div class="chipz">' + chips.join('') + '</div>' : '') + '<div class="row2"><button class="btn" id="hmStart"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>Start</button><button class="btn ghost" id="hmAdj">Adjust</button></div></div>';
+  html += promo;
   const wkMi = milesSince('all', weekStart()), wkN = hist.filter(x => x.date >= weekStart()).length, wkT = hist.filter(x => x.date >= weekStart()).reduce((a, b) => a + b.secs, 0), tgt = weekTarget(), st = streak(hist);
   html += '<button class="wk" id="hmWk" aria-label="This week: ' + wkMi.toFixed(1) + ' of ' + tgt + ' miles">' + ringSvg(wkMi / tgt, 92, 10) + '<div class="t"><span class="lbl">This week</span><b>' + wkMi.toFixed(1) + '<small>/ ' + fmtG(tgt) + ' mi</small></b><div class="mini"><span><b>' + wkN + '</b>workouts</span><span><b>' + mmss(wkT) + '</b>time</span><span><b style="color:var(--warn)">' + st + '</b>day streak</span></div></div></button>';
   gAct = S.act;
@@ -1462,7 +1485,7 @@ $('#hmAv').onclick = () => go('you');
 function renderYou() {
   if (!S.since) { S.since = hist.length ? hist[hist.length - 1].date : Date.now(); save(); }
   const tot = hist.reduce((a, b) => a + b.mi, 0), secs = hist.reduce((a, b) => a + b.secs, 0), lv = level(tot);
-  $('#yAv').textContent = (S.name || 'G').charAt(0).toUpperCase();
+  avFill($('#yAv'));
   $('#yName').textContent = S.name || 'You';
   $('#ySince').textContent = 'Level ' + lv.n + ' · Moving since ' + new Date(Math.min(S.since, ...hist.map(x => x.date))).toLocaleDateString([], { month: 'short', year: 'numeric' });
   $('#yTot').innerHTML = [[tot.toFixed(1), 'Miles'], [hist.length, 'Workouts'], [(secs / 3600).toFixed(1), 'Hours']].map(([v, l]) => '<div><b>' + v + '</b><small>' + l + '</small></div>').join('');
