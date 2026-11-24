@@ -16,7 +16,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{--ease-out:cubic-bezier(0.23,1,0.32,1);--ease-io:cubic-bezier(0.77,0,0.175,1);--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--ac:#D6F94B;--onac:#0C0E0D;--warn:#FF9A5C;--hi:#1D2312;--hib:#3E4A1C;--cond:'Barlow Condensed',sans-serif}
+:root{--ease-out:cubic-bezier(0.23,1,0.32,1);--ease-io:cubic-bezier(0.77,0,0.175,1);--bg:#0C0E0D;--s1:#171A18;--s2:#1E221F;--s3:#2A2F2B;--line:#262A27;--line2:#343935;--tx:#F3F4EF;--mu:#9BA19B;--mu2:#C9CDC8;--warn:#FFB020;--cond:'Barlow Condensed',sans-serif}
+:root,[data-theme=ember]{--ac:#FF6B3D;--onac:#170803;--hi:#24130C;--hib:#4E2414;--hit:#EBC3B2;--acs:rgba(255,107,61,.22)}
+[data-theme=glacier]{--ac:#5B9DFF;--onac:#040A16;--hi:#0F1A2B;--hib:#203D68;--hit:#BCD0EE;--acs:rgba(91,157,255,.22)}
+[data-theme=mint]{--ac:#3FE0AE;--onac:#03130D;--hi:#0D221C;--hib:#1B4A3B;--hit:#B6E5D3;--acs:rgba(63,224,174,.22)}
+[data-theme=volt]{--ac:#D6F94B;--onac:#0C0E0D;--hi:#1D2312;--hib:#3E4A1C;--hit:#DDE3CC;--acs:rgba(214,249,75,.22)}
+[stroke="#D6F94B"]{stroke:var(--ac)}[fill="#D6F94B"]{fill:var(--ac)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 #s-setup .cta{position:sticky;bottom:calc(-1 * env(safe-area-inset-bottom) - 18px);margin:0 -20px calc(-1 * env(safe-area-inset-bottom) - 18px);padding:10px 20px calc(env(safe-area-inset-bottom) + 18px);background:linear-gradient(to bottom,rgba(12,14,13,0),var(--bg) 14px);z-index:5}
@@ -48,7 +53,7 @@ button:disabled{opacity:.4;cursor:default}
 .goal{display:flex;flex-direction:column;align-items:center}
 .goal .num{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .goal .num{touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:text}
-#goalIn::selection{background:rgba(214,249,75,.3);color:#F3F4EF}
+#goalIn::selection{background:var(--acs);color:#F3F4EF}
 #goalIn{font-family:var(--cond);font-weight:700;font-size:min(150px,36vw);line-height:.9;letter-spacing:-.02em;text-align:center;background:transparent;border:none;border-bottom:3px solid var(--ac);border-radius:0;color:var(--tx);padding:0;margin:0;outline:none;caret-color:var(--ac);max-width:62vw;font-variant-numeric:tabular-nums}
 .lbl{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
 .muted{color:var(--mu)}
@@ -80,7 +85,7 @@ button:disabled{opacity:.4;cursor:default}
 .pill{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 14px;border-radius:16px;background:var(--hi);border:1px solid var(--hib)}
 .pill .t{flex:1;min-width:0;display:flex;flex-direction:column}
 .pill .t b{font-size:14px}
-.pill .t span{font-size:12.5px;color:#B9C0A6}
+.pill .t span{font-size:12.5px;color:var(--hit)}
 .pill button{width:36px;height:36px;border-radius:18px;border:none;background:transparent;color:var(--mu2)}
 .map{position:relative;height:300px;flex-shrink:0;border-radius:22px;overflow:hidden;background:#111412}
 .map .leaflet-container{background:#111412;height:100%}
@@ -122,11 +127,11 @@ button:disabled{opacity:.4;cursor:default}
 .banner svg{width:22px;height:22px;flex-shrink:0}
 .banner .t{display:flex;flex-direction:column;gap:1px;min-width:0}
 .banner .t b{font-size:15px}
-.banner .t span{font-size:13px;color:#B9C0A6}
+.banner .t span{font-size:13px;color:var(--hit)}
 .banner.warn{background:#2A1A10;border-color:#5A3218}
 .banner.warn .t span{color:#D9B9A6}
 .banner.gb{background:var(--ac);border-color:var(--ac);color:var(--onac)}
-.banner.gb .t span{color:#2E3510}
+.banner.gb .t span{color:var(--onac);opacity:.78}
 .turn{display:none;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:var(--s1)}
 .turn.on{display:flex}
 .turn .ar{width:44px;height:44px;border-radius:12px;background:var(--s3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -151,7 +156,8 @@ button:disabled{opacity:.4;cursor:default}
 @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:scale(1)}}
 .pop{animation:pop .5s cubic-bezier(.2,.8,.2,1) both}
 .check{width:88px;height:88px;border-radius:44px;background:var(--ac);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px var(--hi);align-self:center}
-.check.miss{background:var(--s3);box-shadow:0 0 0 10px var(--s1)}
+.check.miss{background:transparent;box-shadow:none}
+.check.miss svg.r{width:88px;height:88px}
 .splits{display:flex;flex-direction:column;gap:12px;padding:16px}
 .sp{display:grid;grid-template-columns:58px minmax(0,1fr) 56px;align-items:center;gap:12px;font-size:14px}
 .sp .bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
@@ -160,7 +166,7 @@ button:disabled{opacity:.4;cursor:default}
 .sp b{font-family:var(--cond);font-weight:600;font-size:20px;text-align:right;font-variant-numeric:tabular-nums}
 .badges{display:flex;gap:8px}
 .badge{flex:1 1 0;display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;border:1px solid var(--line);background:#141614}
-.badge.g{border-color:var(--hib);background:#141810}
+.badge.g{border-color:var(--hib);background:var(--hi)}
 .badge svg{width:22px;height:22px;flex-shrink:0}
 .badge .t{display:flex;flex-direction:column;min-width:0}
 .badge .t b{font-size:14px}.badge .t span{font-size:12.5px;color:var(--mu)}
@@ -169,6 +175,17 @@ button:disabled{opacity:.4;cursor:default}
 .two .stat{flex:1 1 0}
 .two .stat b{font-size:40px;font-weight:700}
 .two .stat small{font-size:18px;color:var(--mu);margin-left:4px;font-family:var(--cond)}
+.seg.sm button{height:34px;font-size:13px}
+.cal{padding:16px;display:flex;flex-direction:column;gap:12px}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.calg em{font-style:normal;font-size:11px;font-weight:600;color:var(--mu);padding-bottom:4px}
+.calg span{position:relative;height:38px;display:flex;align-items:center;justify-content:center}
+.calg span i{position:absolute;border-radius:50%;background:var(--ac);opacity:.9}
+.calg span b{position:relative;font-size:12.5px;font-weight:600;color:var(--mu2)}
+.calg span i+b{color:var(--onac)}
+.calg span.td b{text-decoration:underline;text-decoration-color:var(--ac);text-underline-offset:4px;color:var(--tx)}
+.calg span.td i+b{color:var(--onac)}
+.calg span.fu b{color:#4A504B}
 .chart{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;align-items:end;height:132px}
 .chart div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
 .chart i{display:block;width:100%;border-radius:6px;background:var(--line)}
@@ -192,13 +209,13 @@ button:disabled{opacity:.4;cursor:default}
 .sheet h2{margin:0;font-family:var(--cond);font-weight:700;font-size:26px;letter-spacing:.04em;text-transform:uppercase}
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:14px;font-weight:600}
-.field input{height:48px;border-radius:12px;border:1.5px solid var(--line2);background:var(--bg);padding:0 14px;font-size:16px}
+.field input{width:100%;min-width:0;height:48px;border-radius:12px;border:1.5px solid var(--line2);background:var(--bg);padding:0 14px;font-size:16px}
 .small{font-size:13px;color:var(--mu);line-height:1.45}
 .small a{color:var(--ac)}
 .danger{height:48px;border-radius:12px;border:1.5px solid #5A3218;background:transparent;color:var(--warn);font-weight:600;font-size:15px}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 110px);transform:translateX(-50%) translateY(20px);z-index:4000;padding:12px 18px;border-radius:14px;background:#F3F4EF;color:#0C0E0D;font-weight:600;font-size:14.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
-.you{width:18px;height:18px;border-radius:9px;background:#F3F4EF;border:3px solid #0C0E0D;box-shadow:0 0 0 8px rgba(214,249,75,.22)}
+.you{width:18px;height:18px;border-radius:9px;background:#F3F4EF;border:3px solid #0C0E0D;box-shadow:0 0 0 8px var(--acs)}
 .pin{width:16px;height:16px;border-radius:8px;border:3px solid #0C0E0D}
 .mk{min-width:26px;height:26px;padding:0 4px;border-radius:13px;background:#0C0E0D;border:2px solid var(--ac);color:var(--tx);font:700 13px/22px var(--cond);text-align:center}
 .spd{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:12px 14px;gap:8px}
@@ -223,7 +240,7 @@ button:disabled{opacity:.4;cursor:default}
 .wo .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .wo .t b{font-size:14.5px}.wo .t span{font-size:12.5px;color:var(--mu)}
 .wo button{height:36px;padding:0 14px;border-radius:18px;border:none;background:var(--s3);color:var(--tx);font-weight:600;font-size:13.5px;white-space:nowrap}
-.tip{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:var(--hi);border:1px solid var(--hib);font-size:14px;line-height:1.4;color:#DDE3CC}
+.tip{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:var(--hi);border:1px solid var(--hib);font-size:14px;line-height:1.4;color:var(--hit)}
 .tip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}
 .pred{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .pred div{display:flex;flex-direction:column;gap:2px;padding:12px 10px;border-radius:14px;background:var(--bg)}
@@ -243,6 +260,87 @@ button:disabled{opacity:.4;cursor:default}
 .wx b{color:var(--mu2);font-weight:600}
 .wx.warn{color:var(--warn)}
 .pacer .best{height:32px;padding:0 10px;border-radius:16px;border:1.5px solid var(--line2);background:transparent;font-size:12.5px;font-weight:600;color:var(--mu2);margin-left:4px;width:auto!important}
+.screen.tabbed{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:900;margin:0 auto;max-width:480px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;padding:8px 10px calc(env(safe-area-inset-bottom) + 8px);background:linear-gradient(to bottom,rgba(12,14,13,.0),rgba(12,14,13,.92) 22%,#0C0E0D 60%)}
+.tabbar[hidden]{display:none}
+.tabbar button{height:54px;border:none;background:transparent;color:var(--mu);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.tabbar button svg{width:24px;height:24px}
+.tabbar button[aria-current=page]{color:var(--tx)}
+.tabbar button[aria-current=page] svg{color:var(--ac)}
+.tabbar .recb{width:64px;height:64px;margin:0 auto 2px;border-radius:32px;background:var(--ac);color:var(--onac);box-shadow:0 6px 24px var(--acs)}
+.tabbar .recb svg{width:26px;height:26px}
+.tabbar .recb:active{transform:scale(.96)}
+.tabbar button{transition:color .2s ease,transform 160ms var(--ease-out)}
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-top:6px}
+.hd .t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hd .t small{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
+.hd h1{margin:0;font:700 34px/1.02 var(--cond);letter-spacing:.01em}
+.av{width:44px;height:44px;flex-shrink:0;border-radius:22px;border:none;background:var(--s2);color:var(--tx);font:700 19px var(--cond);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1.5px var(--line2)}
+.hero{display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:22px;background:var(--s1);position:relative;overflow:hidden}
+.hero .k{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
+.hero .big{font:700 64px/.9 var(--cond);font-variant-numeric:tabular-nums}
+.hero .big small{font-size:24px;color:var(--mu);margin-left:6px;font-weight:600}
+.hero .meta{font-size:14px;color:var(--mu2)}
+.hero .row2{display:flex;gap:10px}
+.hero .row2 .btn{height:56px;font-size:21px}
+.hero .row2 .btn.ghost{flex:0 0 auto;padding:0 20px;height:56px;font-size:17px}
+.hero .chipz{display:flex;gap:6px;flex-wrap:wrap}
+.hero .chipz span{height:28px;padding:0 10px;border-radius:14px;background:var(--s3);font-size:12.5px;font-weight:600;color:var(--mu2);display:flex;align-items:center;gap:6px}
+.hero .chipz span.ac{background:var(--hi);color:var(--hit)}
+.wk{display:flex;align-items:center;gap:16px;padding:16px;border-radius:22px;background:var(--s1);width:100%;border:none;text-align:left;color:var(--tx)}
+.wk svg.r{width:92px;height:92px;flex-shrink:0}
+.wk .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.wk .t b{font:700 30px/1 var(--cond);font-variant-numeric:tabular-nums}
+.wk .t b small{font-size:16px;color:var(--mu);font-weight:600;margin-left:4px}
+.wk .mini{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:16px;font-size:11.5px;color:var(--mu)}
+.wk .mini span{display:flex;flex-direction:column;gap:1px}
+.wk .mini b{font:600 17px var(--cond);color:var(--tx)}
+.sh{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
+.sh b{font-size:17px}
+.sh button{border:none;background:transparent;color:var(--ac);font-weight:600;font-size:14px;height:36px;padding:0 4px}
+.act{display:flex;align-items:center;gap:14px;padding:12px;border-radius:18px;background:var(--s1);border:none;width:100%;text-align:left;color:var(--tx)}
+.act .th{width:64px;height:64px;flex-shrink:0;border-radius:14px;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.act .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.act .t b{font-size:15.5px}.act .t span{font-size:13px;color:var(--mu)}
+.act .d{font:700 24px var(--cond);font-variant-numeric:tabular-nums;text-align:right}
+.act .d small{display:block;font:600 11px Barlow,sans-serif;color:var(--mu);letter-spacing:.08em;text-transform:uppercase}
+.ms{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:18px;background:var(--s1)}
+.ms .row{justify-content:space-between}
+.prof{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 0 4px;text-align:center}
+.prof .av{width:84px;height:84px;border-radius:42px;font-size:36px;box-shadow:inset 0 0 0 2px var(--ac)}
+.prof h1{margin:0;font:700 30px/1 var(--cond)}
+.prof span{font-size:13.5px;color:var(--mu)}
+.tot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tot div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px;border-radius:16px;background:var(--s1)}
+.tot b{font:700 26px var(--cond);font-variant-numeric:tabular-nums}
+.tot small{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
+.lvl{display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:18px;background:var(--s1)}
+.lvl .row{justify-content:space-between;font-size:14px;color:var(--mu2)}
+.lvl b{color:var(--tx)}
+.setl{display:flex;flex-direction:column;padding:2px 16px;border-radius:18px;background:var(--s1)}
+.setl button{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;border:none;border-bottom:1px solid var(--line);background:transparent;color:var(--tx);font-size:15px;font-weight:600;text-align:left;padding:0}
+.setl button:last-child{border-bottom:none}
+.setl button span{font-weight:500;color:var(--mu);font-size:14px}
+.swatches{display:flex;gap:10px}
+.swatches button{flex:1;height:56px;border-radius:14px;border:2px solid transparent;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mu2);font-size:12px;font-weight:600}
+.swatches button i{width:18px;height:18px;border-radius:9px}
+.swatches button[aria-pressed=true]{border-color:var(--tx);color:var(--tx)}
+.saved{display:flex;flex-direction:column;gap:8px}
+.sv{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--s1)}
+.sv .th{width:52px;height:52px;border-radius:12px;background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sv .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;text-align:left;border:none;background:transparent;color:var(--tx);padding:0}
+.sv .t b{font-size:15px}.sv .t span{font-size:12.5px;color:var(--mu)}
+.sv .x{width:40px;height:40px;border:none;border-radius:20px;background:transparent;color:var(--mu)}
+.r2{display:flex;gap:10px}
+.r2 .btn.ghost{flex:1;height:52px;font-size:17px}
+#finish{position:relative}
+#finish .hold{position:absolute;inset:-5px;width:74px;height:74px;pointer-events:none;transform:rotate(-90deg)}
+#finish .hold circle{fill:none;stroke:var(--ac);stroke-width:4;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 200ms var(--ease-out)}
+#finish.holding .hold circle{stroke-dashoffset:0;transition:stroke-dashoffset 800ms linear}
+#finish.holding{transform:scale(.96);transition:transform 160ms var(--ease-out)}
+.empty{display:flex;flex-direction:column;gap:10px;padding:20px;border-radius:22px;background:var(--hi);border:1px solid var(--hib)}
+.empty b{font:700 26px/1.05 var(--cond)}
+.empty span{font-size:14.5px;line-height:1.5;color:var(--hit)}
 #onb{position:fixed;inset:0;z-index:4500;margin:0 auto;max-width:480px;background:var(--bg);display:flex;flex-direction:column;gap:18px;padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto}
 .ob-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
 .ob-dots{display:flex;gap:6px}
@@ -269,50 +367,61 @@ button:disabled{opacity:.4;cursor:default}
 .ob-nav{display:flex;gap:10px;margin-top:auto;padding-top:8px}
 .ob-nav .rb{border:1.5px solid var(--line2)}
 #splash{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
-.sp-in{display:flex;flex-direction:column;align-items:center;gap:16px}
-.sp-ring{width:76px;height:76px}
-.sp-ring circle{fill:none;stroke-width:9}
-.sp-track{stroke:#262A27}
+.sp-in{display:flex;flex-direction:column;align-items:center;gap:18px}
+.sp-ring{width:88px;height:88px;overflow:visible}
+.sp-ring circle{fill:none;stroke-width:8}
+.sp-track{stroke:#22262A}
 .sp-arc{stroke:var(--ac);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100}
-.sp-word{overflow:hidden;padding:2px 4px}
-.sp-word span{display:block;font:700 34px/1.05 var(--cond);letter-spacing:.08em;text-transform:uppercase;transform:translateY(110%)}
-.sp-tag{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mu);opacity:0;transform:translateY(6px)}
-#splash.go .sp-arc{animation:spDraw 760ms var(--ease-io) 120ms forwards}
-#splash.go .sp-word span{animation:spUp 520ms var(--ease-out) 520ms forwards}
-#splash.go .sp-tag{animation:spTag 360ms var(--ease-out) 780ms forwards}
-#splash.go .sp-in{animation:spLift 380ms var(--ease-out) 1420ms forwards}
-#splash.go{animation:spOut 380ms var(--ease-out) 1420ms forwards}
+.sp-head{fill:var(--ac)!important;stroke:var(--bg)!important;stroke-width:3!important}
+.sp-dot{transform-origin:40px 40px;opacity:0}
+.sp-ping{stroke:var(--ac);stroke-width:2!important;opacity:0;transform-origin:14.02px 25px}
+.sp-word{display:flex;overflow:hidden;padding:2px 6px}
+.sp-word i{display:block;font-style:normal;font:700 38px/1.05 var(--cond);letter-spacing:.06em;transform:translateY(115%)}
+.sp-tag{font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mu);opacity:0;transform:translateY(6px)}
+#splash.go .sp-arc{animation:spDraw 1000ms var(--ease-io) 150ms forwards}
+#splash.go .sp-dot{animation:spDot 1000ms var(--ease-io) 150ms forwards}
+#splash.go .sp-ping{animation:spPing 600ms var(--ease-out) 1130ms forwards}
+#splash.go .sp-word i{animation:spUp 480ms var(--ease-out) calc(1000ms + var(--i) * 35ms) forwards}
+#splash.go .sp-tag{animation:spTag 380ms var(--ease-out) 1520ms forwards}
+#splash.go .sp-in{animation:spLift 450ms var(--ease-out) 2150ms forwards}
+#splash.go{animation:spOut 450ms var(--ease-out) 2150ms forwards}
 #splash.skip{animation:spOut 180ms var(--ease-out) forwards!important}
-body.intro #s-setup>*:not(.grow){animation:rise 380ms var(--ease-out) both}
-body.intro #s-setup>:nth-child(1){animation-delay:1500ms}body.intro #s-setup>:nth-child(2){animation-delay:1540ms}body.intro #s-setup>:nth-child(3){animation-delay:1580ms}body.intro #s-setup>:nth-child(4){animation-delay:1620ms}body.intro #s-setup>:nth-child(5){animation-delay:1640ms}body.intro #s-setup>:nth-child(6){animation-delay:1660ms}body.intro #s-setup>:nth-child(7){animation-delay:1700ms}body.intro #s-setup>:nth-child(n+8){animation-delay:1740ms}
-body.intro.fast #s-setup>*{animation-delay:120ms!important}
-@keyframes spFade{to{opacity:1}}
-@keyframes spDraw{to{stroke-dashoffset:33}}
+body.intro .screen.on>*{animation:rise 400ms var(--ease-out) both}
+body.intro .screen.on>:nth-child(1){animation-delay:2260ms}body.intro .screen.on>:nth-child(2){animation-delay:2300ms}body.intro .screen.on>:nth-child(3){animation-delay:2340ms}body.intro .screen.on>:nth-child(n+4){animation-delay:2380ms}
+body.intro .tabbar{animation:rise 400ms var(--ease-out) 2300ms both}
+body.intro.fast .screen.on>*,body.intro.fast .tabbar{animation-delay:120ms!important}
+@keyframes spDraw{to{stroke-dashoffset:16.67}}
+@keyframes spDot{0%{opacity:1;transform:rotate(0)}100%{opacity:1;transform:rotate(300deg)}}
+@keyframes spPing{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
 @keyframes spUp{to{transform:translateY(0)}}
 @keyframes spTag{to{opacity:1;transform:translateY(0)}}
-@keyframes spLift{to{transform:translateY(-10px) scale(.98)}}
+@keyframes spLift{to{transform:translateY(-12px) scale(.98)}}
 @keyframes spOut{to{opacity:0;visibility:hidden}}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 @media (prefers-reduced-motion:reduce){
 *:not(#splash){transition:none!important;animation:none!important}
-.sp-arc{stroke-dashoffset:33}.sp-word span{transform:none}.sp-tag{opacity:1;transform:none}
-#splash.go{animation:spOut 250ms ease 450ms forwards}
+.sp-arc{stroke-dashoffset:16.67}.sp-dot{opacity:1;transform:rotate(300deg)}.sp-word i{transform:none}.sp-tag{opacity:1;transform:none}
+#splash.go{animation:spOut 300ms ease 700ms forwards}
 }
 @media (max-height:740px){.goal .num{font-size:120px}.opt{padding:9px 0}.screen{gap:12px}}
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><div class="sp-in"><svg class="sp-ring" viewBox="0 0 80 80"><circle class="sp-track" cx="40" cy="40" r="30" pathLength="100"/><circle class="sp-arc" cx="40" cy="40" r="30" pathLength="100" transform="rotate(-90 40 40)"/></svg><div class="sp-word"><span>Goal Miles</span></div><div class="sp-tag">Set the distance. Go.</div></div></div>
+<div id="splash" aria-hidden="true"><div class="sp-in"><svg class="sp-ring" viewBox="0 0 80 80"><circle class="sp-track" cx="40" cy="40" r="30"/><circle class="sp-arc" cx="40" cy="40" r="30" pathLength="100" transform="rotate(-90 40 40)"/><circle class="sp-ping" cx="14.02" cy="25" r="7"/><g class="sp-dot"><circle class="sp-head" cx="40" cy="10" r="7"/></g></svg><div class="sp-word"><i style="--i:0">G</i><i style="--i:1">O</i><i style="--i:2">A</i><i style="--i:3">L</i><i style="--i:4">&nbsp;</i><i style="--i:5">M</i><i style="--i:6">I</i><i style="--i:7">L</i><i style="--i:8">E</i><i style="--i:9">S</i></div><div class="sp-tag">Set the distance. Go.</div></div></div>
 
-<!-- SETUP -->
-<section class="screen on" id="s-setup" aria-label="Set goal">
+<!-- HOME -->
+<section class="screen tabbed on" id="s-home" aria-label="Home">
+  <div class="hd"><div class="t"><small id="hmDate"></small><h1 id="hmHi">Good evening</h1></div><button class="av" id="hmAv" aria-label="Your profile">G</button></div>
+  <div id="hmWx" class="wx" style="text-align:left;margin:0" hidden></div>
+  <div id="hmMain" style="display:flex;flex-direction:column;gap:14px"></div>
+</section>
+
+<!-- SETUP (record) -->
+<section class="screen" id="s-setup" aria-label="New workout">
   <div class="top">
-    <div class="brand"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="10" fill="none" stroke="#262A27" stroke-width="4"/><path d="M13 3a10 10 0 0 1 9.5 13" fill="none" stroke="#D6F94B" stroke-width="4" stroke-linecap="round"/></svg>Goal Miles</div>
-    <div class="row">
-      <button class="ib" id="toGoals" aria-label="Goals and coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg></button>
-      <button class="ib" id="toHist" aria-label="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
-      <button class="ib" id="toSet" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
-    </div>
+    <button class="ib" id="recClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="title"><b>New workout</b><span>Double-tap the number to type it</span></div>
+    <span style="width:44px"></span>
   </div>
   <div class="seg" id="act" role="radiogroup" aria-label="Activity">
     <button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button>
@@ -347,10 +456,10 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
 </section>
 
 <!-- ROUTE -->
-<section class="screen" id="s-route" aria-label="Plan a route">
+<section class="screen tabbed" id="s-route" aria-label="Routes">
   <div class="top">
-    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="title"><b>Plan a route</b><span id="rSub">2 mi walk from your location</span></div>
+    <span style="width:44px"></span>
+    <div class="title"><b>Routes</b><span id="rSub">2 mi walk from your location</span></div>
     <button class="ib" id="shuffle" aria-label="Suggest new routes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
   </div>
   <div class="map" id="rMapBox"><div id="rMap" style="height:100%"></div><div class="ov" id="rOv" style="left:12px;top:12px" hidden><b id="rOvD"></b><span class="muted" id="rOvT"></span></div></div>
@@ -359,9 +468,10 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
     <button role="radio" data-v="loop">Loop</button><button role="radio" data-v="out">Out &amp; back</button><button role="radio" data-v="one">One way</button>
   </div>
   <div class="routes" id="rList" role="radiogroup" aria-label="Suggested routes"></div>
-  <div class="grow"></div>
-  <a class="btn ghost" id="gmaps" target="_blank" rel="noopener" hidden>Open in Google Maps</a>
+  <div class="r2"><button class="btn ghost" id="saveRoute" hidden>Save route</button><a class="btn ghost" id="gmaps" target="_blank" rel="noopener" hidden>Google Maps</a></div>
   <button class="btn" id="useRoute" disabled>Use this route</button>
+  <div class="sh" id="svHead" hidden><b>Saved routes</b><span class="small" id="svN"></span></div>
+  <div class="saved" id="rSaved"></div>
 </section>
 
 <!-- LIVE -->
@@ -382,51 +492,53 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
   <div class="banner" id="bHalf"><svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><div class="t"><b>Halfway. Turn around.</b><span>Head back the way you came to finish at home.</span></div></div>
   <div class="banner warn" id="bOff"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9A5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div class="t"><b>Off route</b><span>Your miles still count. Check the map to get back on.</span></div></div>
   <div class="banner gb" id="bGoal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><div class="t"><b>Goal reached</b><span>Keep going, or tap the check to finish.</span></div></div>
-  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="sTime">0:00</b></div><div class="stat"><span class="lbl">Pace</span><b id="sPace">--</b></div><div class="stat"><span class="lbl" id="s3l">Done by</span><b id="s3">--</b></div></div>
+  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="sTime">0:00</b></div><div class="stat"><span class="lbl" id="sPaceL">Pace</span><b id="sPace">--</b></div><div class="stat"><span class="lbl" id="s3l">Done by</span><b id="s3">--</b></div></div>
   <div class="card spd" id="spd"><div><small>Now</small><b><span id="vNow" class="now">0.0</span><em>mph</em></b></div><div><small>Avg</small><b><span id="vAvg">0.0</span><em>mph</em></b></div><div><small>Top</small><b><span id="vTop">0.0</span><em>mph</em></b></div></div>
   <div class="grow"></div>
   <div class="ctrl">
     <button class="rb" id="discard" aria-label="Discard workout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <button class="play" id="pause" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" id="pauseIc"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg></button>
-    <button class="rb" id="finish" aria-label="Finish and save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg></button>
+    <button class="rb" id="finish" aria-label="Hold to finish and save"><svg class="hold" viewBox="0 0 74 74" aria-hidden="true"><circle cx="37" cy="37" r="34" pathLength="100"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg></button>
   </div>
 </section>
 
 <!-- DONE -->
 <section class="screen" id="s-done" aria-label="Workout summary">
   <div class="top">
-    <button class="ib" data-go="setup" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <span class="lbl" id="dWhen"></span><span style="width:44px"></span>
+    <button class="ib" id="dClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <span class="lbl" id="dWhen"></span><button class="ib" id="dDel" aria-label="Delete activity" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
   </div>
   <div class="check pop" id="dCheck"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg></div>
   <div class="goal" style="gap:2px"><span class="lbl" id="dHead" style="color:var(--ac)">Goal reached</span><span style="font-family:var(--cond);font-weight:700;font-size:92px;line-height:.95;font-variant-numeric:tabular-nums"><span id="dMi">0.00</span><span style="font-size:32px;color:var(--mu);margin-left:6px">mi</span></span></div>
-  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="dTime"></b></div><div class="stat"><span class="lbl">Avg pace</span><b id="dPace"></b></div><div class="stat"><span class="lbl">Goal</span><b id="dGoal"></b></div></div>
+  <div class="stats"><div class="stat"><span class="lbl">Time</span><b id="dTime"></b></div><div class="stat"><span class="lbl" id="dPaceL">Avg pace</span><b id="dPace"></b></div><div class="stat"><span class="lbl">Goal</span><b id="dGoal"></b></div></div>
   <div class="card spd" id="dSpd"><div><small>Avg speed</small><b><span id="dAvg"></span><em>mph</em></b></div><div><small>Top speed</small><b><span id="dTop"></span><em>mph</em></b></div><div><small id="dCalL">Calories</small><b id="dCal"></b></div></div>
   <div class="map" id="doneMap"></div>
   <div class="card splits" id="dSplitsBox"><div class="row" style="justify-content:space-between"><span class="sec">Splits</span><span class="small">min / mile</span></div><div id="dSplits" style="display:flex;flex-direction:column;gap:12px"></div></div>
   <div class="badges" id="dBadges"></div>
-  <div class="cta"><button class="rb" id="share" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button><button class="rb" id="gpx" aria-label="Export GPX"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button><button class="btn" data-go="setup">Done</button></div>
+  <div class="cta"><button class="rb" id="share" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button><button class="rb" id="gpx" aria-label="Export GPX"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button><button class="btn" id="dDone">Done</button></div>
 </section>
 
-<!-- HISTORY -->
-<section class="screen" id="s-hist" aria-label="History">
-  <div class="top">
-    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="title"><b>History</b></div><span style="width:44px"></span>
-  </div>
+<!-- YOU -->
+<section class="screen tabbed" id="s-you" aria-label="You">
+  <div class="prof"><button class="av" id="yAv" aria-label="Edit profile">G</button><h1 id="yName">You</h1><span id="ySince"></span></div>
+  <div class="tot" id="yTot"></div>
+  <div class="lvl" id="yLvl"></div>
   <div class="two"><div class="stat"><span class="lbl">This week</span><b><span id="hWeek">0.0</span><small>mi</small></b></div><div class="stat"><span class="lbl">Streak</span><b style="color:var(--warn)"><span id="hStreak">0</span><small id="hStreakU">days</small></b></div></div>
   <div class="seg" id="hFilt" role="radiogroup" aria-label="Activity filter"><button role="radio" data-v="all">All</button><button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button></div>
-  <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="row" style="justify-content:space-between"><span class="sec">Last 7 days</span><span class="small" id="hGoals"></span></div><div class="chart" id="hChart" role="img"></div></div>
+  <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="row" style="justify-content:space-between"><span class="sec" id="hChartT">Last 7 days</span><span class="small" id="hGoals"></span></div><div class="chart" id="hChart" role="img"></div><div class="seg sm" id="hRange" role="radiogroup" aria-label="Chart range"><button role="radio" data-v="week">Week</button><button role="radio" data-v="month">Weeks</button><button role="radio" data-v="year">Year</button></div></div>
+  <div class="card cal"><div class="row" style="justify-content:space-between"><span class="sec" id="hCalT">This month</span><span class="small" id="hCalN"></span></div><div class="calg" id="hCal" role="img"></div></div>
   <div class="card list"><div class="sec" style="padding:12px 0 2px">Personal bests</div><div id="hBests"></div></div>
   <div class="card"><div class="row" style="justify-content:space-between;padding:14px 16px 10px"><span class="sec">Achievements</span><span class="small" id="hAchN"></span></div><div class="ach" id="hAch"></div></div>
-  <div style="display:flex;flex-direction:column;gap:8px"><span class="sec">Recent</span><div id="hRecent" style="display:flex;flex-direction:column;gap:8px"></div></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><span class="sec">Activities</span><div id="hRecent" style="display:flex;flex-direction:column;gap:8px"></div></div>
+  <div class="sh"><b>Settings</b></div>
+  <div class="setl"><button id="ySet">Settings<span>Theme, route key, weekly target</span></button><button id="yPace">Profile &amp; paces<span>Redo setup</span></button><button id="yGuide">Install &amp; tips<span>Home screen, screen lock</span></button></div>
 </section>
 
 <!-- GOALS -->
-<section class="screen" id="s-goals" aria-label="Goals and coach">
+<section class="screen tabbed" id="s-goals" aria-label="Train">
   <div class="top">
-    <button class="ib" data-go="setup" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="title"><b>Goals &amp; coach</b><span id="gSub">Built from your own workouts</span></div>
+    <span style="width:44px"></span>
+    <div class="title"><b>Train</b><span id="gSub">Goals, predictions, workouts</span></div>
     <button class="ib" id="addGoal" aria-label="Add a goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
   </div>
   <div class="seg" id="gAct" role="radiogroup" aria-label="Activity"><button role="radio" data-v="walk">Walk</button><button role="radio" data-v="run">Run</button><button role="radio" data-v="bike">Bike</button></div>
@@ -452,7 +564,9 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
 <div class="sheet" id="settings" role="dialog" aria-modal="true" aria-labelledby="setH">
   <div class="in">
     <div class="row" style="justify-content:space-between"><h2 id="setH">Settings</h2><button class="ib" id="setClose" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-    <div class="field"><label for="orsKey">Route planner key (OpenRouteService)</label><input id="orsKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your free key"><p class="small" style="margin:0">Free at <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a>. Sign up, open Dashboard, copy the "Basic" key, paste it here. Stays on this phone.</p></div>
+    <div class="field"><label>Accent color</label><div class="swatches" id="swatches"></div></div>
+    <div class="ob-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="field"><label for="nm">First name</label><input id="nm" autocomplete="given-name" placeholder="Optional"></div><div class="field"><label for="wkg">Weekly target (mi)</label><input id="wkg" inputmode="decimal" placeholder="10"></div></div>
+    <div class="field"><label for="orsKey">Route planner key (OpenRouteService)</label><input id="orsKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your free key"><p class="small" style="margin:0">Free at <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a>. Sign up, open Dashboard, copy the "Standard" key, paste it here. Stays on this phone.</p></div>
     <div class="field"><label for="wt">Your weight in lb (optional)</label><input id="wt" inputmode="numeric" placeholder="For calorie estimates"></div>
     <div class="opt" style="border-top:1px solid var(--line)"><div class="t"><b>Demo mode</b><span>Fake GPS so you can try it from the couch</span></div><button class="sw" role="switch" id="demoSw" aria-label="Demo mode"></button></div>
     <p class="small" style="margin:0"><b style="color:var(--tx)">Keep the screen on while you go.</b> iPhone pauses GPS for web apps when the screen locks. Goal Miles keeps the screen awake, and if you do lock it, it estimates the gap in a straight line when you come back.</p>
@@ -461,6 +575,13 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
   </div>
 </div>
 
+<nav class="tabbar" id="tabbar" aria-label="Main">
+  <button data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-tab="goals"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>Train</button>
+  <button class="recb" id="recBtn" aria-label="Start a workout"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 8 4.5z"/></svg></button>
+  <button data-tab="route"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Routes</button>
+  <button data-tab="you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>You</button>
+</nav>
 <div class="count" id="count" aria-live="assertive"><b id="countN">3</b><span class="lbl" id="countMsg">Finding GPS…</span></div>
 <div id="onb" role="dialog" aria-modal="true" aria-label="Pace setup" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -470,7 +591,9 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
 'use strict';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const M = 1609.344;
-const AC = '#D6F94B';
+let AC = '#FF6B3D';
+const THEMES = [['ember', 'Ember', '#FF6B3D'], ['glacier', 'Glacier', '#5B9DFF'], ['mint', 'Mint', '#3FE0AE'], ['volt', 'Volt', '#D6F94B']];
+function applyTheme() { document.documentElement.dataset.theme = S.theme || 'ember'; AC = getComputedStyle(document.documentElement).getPropertyValue('--ac').trim() || AC; }
 const LABEL = { walk: 'walk', run: 'run', bike: 'ride' };
 const VERB = { walk: 'Walking', run: 'Running', bike: 'Riding' };
 const MAXV = { walk: 4, run: 9, bike: 22 };
@@ -479,7 +602,8 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem('gm_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem('gm_' + k, JSON.stringify(v)); } catch {} }
 };
-const S = Object.assign({ act: 'walk', goal: 2, voice: true, outback: false, pacer: false, autop: true, pace: { walk: 1140, run: 570, bike: 240 }, key: '', demo: false }, store.get('settings', {}));
+const S = Object.assign({ act: 'walk', goal: 2, voice: true, outback: false, pacer: false, autop: true, pace: { walk: 1140, run: 570, bike: 240 }, key: '', demo: false, theme: 'ember', name: '', weekGoal: 0 }, store.get('settings', {}));
+applyTheme();
 const save = () => store.set('settings', S);
 let hist = store.get('hist', []);
 let route = null, rType = 'loop', rOpts = [], rPick = 0, rSeed = 0;
@@ -488,6 +612,9 @@ let route = null, rType = 'loop', rOpts = [], rPick = 0, rSeed = 0;
 const fmtG = g => Number.isInteger(g) ? String(g) : String(+(+g).toFixed(2));
 const mmss = t => { t = Math.max(0, Math.round(t)); const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60; return h ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') : m + ':' + String(s).padStart(2, '0'); };
 const pace = (sec, mi) => mi > 0.02 ? mmss(sec / mi) : '--';
+const mph = (sec, mi) => sec > 0 && mi > 0.02 ? (mi / (sec / 3600)).toFixed(1) : '--';
+const rateTxt = (act, sec, mi) => act === 'bike' ? mph(sec, mi) + ' mph' : pace(sec, mi) + ' /mi';
+const targetTxt = act => act === 'bike' ? (3600 / S.pace[act]).toFixed(1) + ' mph' : mmss(S.pace[act]) + ' /mi';
 const clock = d => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 const rad = x => x * Math.PI / 180;
 function hav(a, b) { const R = 6371000, dLa = rad(b[0] - a[0]), dLo = rad(b[1] - a[1]); const h = Math.sin(dLa / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
@@ -513,16 +640,27 @@ const spokenMi = mi => { const r = Math.round(mi * 100) / 100; return (r % 1 ===
 const spokenT = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ' hour' + (h > 1 ? 's ' : ' ') : '') + (m ? m + ' minute' + (m > 1 ? 's ' : ' ') : '') + (!h && x ? x + ' seconds' : ''); };
 
 /* ---------- navigation ---------- */
-let cur = 'setup';
+let cur = 'home', lastTab = 'home';
+const TABS = ['home', 'goals', 'route', 'you'];
+function showScreen(id) {
+  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-' + id)); cur = id;
+  const tab = TABS.includes(id);
+  $('#tabbar').hidden = !tab;
+  if (tab) { lastTab = id; $$('#tabbar [data-tab]').forEach(b => { if (b.dataset.tab === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+  const el = $('#s-' + id); if (el) el.scrollTo(0, 0);
+}
 function go(s) {
-  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-' + s)); cur = s;
+  if (s === 'hist') s = 'you';
+  showScreen(s);
   if (s === 'setup') renderSetup();
   if (s === 'route') openRoute();
-  if (s === 'hist') renderHist();
+  if (s === 'you') renderYou();
   if (s === 'goals') renderGoals();
-  window.scrollTo(0, 0);
+  if (s === 'home') renderHome();
 }
-$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+$$('#tabbar [data-tab]').forEach(b => b.addEventListener('click', () => { if (cur === b.dataset.tab) { const el = $('#s-' + cur); el && el.scrollTo({ top: 0, behavior: 'smooth' }); return; } go(b.dataset.tab); }));
+$('#recBtn').onclick = () => go('setup');
+$('#recClose').onclick = () => go(lastTab);
 
 /* ---------- setup ---------- */
 function renderSetup() {
@@ -530,11 +668,12 @@ function renderSetup() {
   $('#goalNum').textContent = fmtG(S.goal);
   $('#goalUnit').textContent = S.goal === 1 ? 'mile' : 'miles';
   const mins = Math.round(S.goal * S.pace[S.act] / 60);
-  $('#eta').innerHTML = 'Est. <b>' + (mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min') + '</b> at ' + mmss(S.pace[S.act]) + ' /mi';
+  $('#eta').innerHTML = 'Est. <b>' + (mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min') + '</b> at ' + targetTxt(S.act);
   $$('#chips button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === S.goal));
   $$('.sw[data-k]').forEach(b => b.setAttribute('aria-checked', !!S[b.dataset.k]));
   $('#pacerRow').classList.toggle('on', S.pacer);
-  $('#pVal').textContent = mmss(S.pace[S.act]);
+  $('#pVal').textContent = S.act === 'bike' ? (3600 / S.pace.bike).toFixed(1) : mmss(S.pace[S.act]);
+  $('#pacerRow .small').textContent = S.act === 'bike' ? 'Target speed (mph)' : 'Target pace /mi';
   $('#startLbl').textContent = 'Start ' + LABEL[S.act];
   if (typeof renderWx === 'function') renderWx();
   const ok = route && route.act === S.act && Math.abs(route.goal - S.goal) < 0.001;
@@ -569,23 +708,25 @@ gIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault
 gIn.addEventListener('blur', () => commitGoal(true));
 $$('#chips button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderSetup(); });
 $$('.sw[data-k]').forEach(b => b.onclick = () => { S[b.dataset.k] = !S[b.dataset.k]; save(); renderSetup(); });
-$('#pDec').onclick = () => { S.autoPace = false; S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
-$('#pInc').onclick = () => { S.autoPace = false; S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
+$('#pDec').onclick = () => { S.autoPace = false; if (S.act === 'bike') { S.pace.bike = Math.round(3600 / Math.max(4, 3600 / S.pace.bike - 0.5)); save(); return renderSetup(); } S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
+$('#pInc').onclick = () => { S.autoPace = false; if (S.act === 'bike') { S.pace.bike = Math.round(3600 / Math.min(35, 3600 / S.pace.bike + 0.5)); save(); return renderSetup(); } S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
 $('#rpClear').onclick = () => { route = null; renderSetup(); };
 $('#toRoute').onclick = () => go('route');
-$('#toHist').onclick = () => go('hist');
-$('#toGoals').onclick = () => go('goals');
 $('#pBest').onclick = () => { const b = bestPaceFor(S.act, S.goal); if (!b) return toast('No past ' + LABEL[S.act] + 's near this distance yet'); S.pace[S.act] = Math.round(b); S.pacer = true; save(); renderSetup(); toast('Racing your best: ' + mmss(b) + ' /mi'); };
 
 /* ---------- settings ---------- */
-function openSettings() { $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
-function closeSettings() { S.wt = parseFloat($('#wt').value) || 0; S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); }
-$('#toSet').onclick = openSettings;
+function openSettings() { $('#nm').value = S.name || ''; $('#wkg').value = S.weekGoal || ''; renderSwatches(); $('#wt').value = S.wt || ''; $('#orsKey').value = S.key; $('#demoSw').setAttribute('aria-checked', S.demo); $('#settings').classList.add('on'); }
+function closeSettings() { S.name = $('#nm').value.trim().slice(0, 24); S.weekGoal = parseFloat($('#wkg').value) || 0; S.wt = parseFloat($('#wt').value) || 0; S.key = $('#orsKey').value.trim(); save(); $('#settings').classList.remove('on'); if (cur === 'route') openRoute(); if (cur === 'you') renderYou(); if (cur === 'home') renderHome(); }
+
 $('#setClose').onclick = closeSettings;
 $('#settings').addEventListener('click', e => { if (e.target.id === 'settings') closeSettings(); });
 $('#demoSw').onclick = () => { S.demo = !S.demo; save(); $('#demoSw').setAttribute('aria-checked', S.demo); toast(S.demo ? 'Demo mode on: fake GPS' : 'Demo mode off: real GPS'); };
 $('#clearHist').onclick = () => { if (!$('#clearHist').dataset.arm) { $('#clearHist').dataset.arm = 1; $('#clearHist').textContent = 'Tap again to delete everything'; setTimeout(() => { delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; }, 3000); return; } hist = []; store.set('hist', hist); toast('History cleared'); delete $('#clearHist').dataset.arm; $('#clearHist').textContent = 'Clear all history'; };
 
+function renderSwatches() {
+  $('#swatches').innerHTML = THEMES.map(([k, n, c]) => '<button data-th="' + k + '" aria-pressed="' + ((S.theme || 'ember') === k) + '"><i style="background:' + c + '"></i>' + n + '</button>').join('');
+  $$('#swatches [data-th]').forEach(b => b.onclick = () => { S.theme = b.dataset.th; save(); applyTheme(); renderSwatches(); });
+}
 /* ---------- maps ---------- */
 const TILE = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -636,7 +777,7 @@ $('#rDist').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preven
 $('#rDist').addEventListener('blur', e => setRouteDist(parseFloat(e.target.value.replace(',', '.')), true));
 $('#rDist').addEventListener('focus', e => e.target.select());
 function openRoute() {
-  syncDist();
+  syncDist(); renderSaved();
   $('#rSub').textContent = fmtG(S.goal) + ' mi ' + LABEL[S.act] + ' from your location';
   $$('#rType button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === rType));
   if (!rMap) rMap = mkMap('rMap');
@@ -706,7 +847,7 @@ async function genRoutes() {
   const my = ++genId;
   const box = $('#rList');
   box.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-  $('#useRoute').disabled = true; $('#gmaps').hidden = true; $('#rOv').hidden = true;
+  $('#useRoute').disabled = true; $('#gmaps').hidden = true; $('#saveRoute').hidden = true; $('#rOv').hidden = true;
   rLayers.forEach(l => rMap.removeLayer(l)); rLayers = [];
   let start;
   try { start = await locate(); } catch (e) { box.innerHTML = '<div class="msg">' + e.message + '</div>'; return; }
@@ -744,14 +885,14 @@ function drawRoutes() {
   rLayers.push(L.marker(r.start, { icon: youIcon(), interactive: false }).addTo(rMap));
   rMap.fitBounds(L.latLngBounds(r.coords), { padding: [28, 28] });
   $('#rOv').hidden = false; $('#rOvD').textContent = (r.m / M).toFixed(2) + ' mi'; $('#rOvT').textContent = '~' + Math.round(r.m / M * S.pace[S.act] / 60) + ' min';
-  $('#useRoute').disabled = false;
+  $('#useRoute').disabled = false; $('#saveRoute').hidden = false;
   const g = $('#gmaps'), at = f => r.coords[Math.round(f * (r.coords.length - 1))].map(x => x.toFixed(6)).join(',');
   const o = r.start.map(x => x.toFixed(6)).join(','), wps = r.type === 'one' ? [at(.33), at(.66)] : r.type === 'out' ? [at(.25)] : [at(.25), at(.5), at(.75)];
   const dst = r.type === 'one' ? at(1) : r.type === 'out' ? r.coords[r.outIdx].map(x => x.toFixed(6)).join(',') : o;
   g.href = 'https://www.google.com/maps/dir/?api=1&origin=' + o + '&destination=' + dst + '&waypoints=' + encodeURIComponent(wps.join('|')) + '&travelmode=' + (S.act === 'bike' ? 'bicycling' : 'walking');
   g.hidden = false;
 }
-$('#useRoute').onclick = () => { route = rOpts[rPick]; if (route.type === 'out') S.outback = true; save(); go('setup'); toast('Route set. Hit start when you\'re ready.'); };
+$('#useRoute').onclick = () => { route = rOpts[rPick]; S.act = route.act; S.goal = route.goal; if (route.type === 'out') S.outback = true; save(); go('setup'); toast('Route set. Hit start when you\'re ready.'); };
 
 /* ---------- tracking ---------- */
 let T = null, watchId = null, ticker = null, demoTimer = null, wake = null, lMap = null, lLayers = {};
@@ -770,7 +911,7 @@ $('#start').onclick = () => {
   chime(1);
 };
 function showLive() {
-  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-live')); cur = 'live';
+  showScreen('live');
   $('#lGoal').textContent = fmtG(T.goal);
   $('#s-live').classList.toggle('mapmode', !!T.route && !!T.mapMode);
   $('#turn').classList.toggle('on', !!T.route);
@@ -869,7 +1010,7 @@ function render() {
   const st = !T.running ? 'Get ready' : T.paused ? 'Paused' : T.auto ? 'Auto-paused' : T.goalHit ? 'Goal reached' : VERB[T.act];
   $('#lStatus').textContent = st; $('#lDot').className = 'dot' + (T.paused || T.auto ? ' p' : '');
   $('#sTime').textContent = mmss(T.active);
-  $('#sPace').textContent = pace(T.active, T.mi);
+  $('#sPaceL').textContent = T.act === 'bike' ? 'Speed' : 'Pace'; $('#sPace').textContent = T.act === 'bike' ? mph(T.active, T.mi) : pace(T.active, T.mi);
   if (T.pacer) { const diff = T.mi * T.target - T.active; $('#s3l').textContent = diff >= 0 ? 'Ahead' : 'Behind'; $('#s3').textContent = T.mi > 0.02 ? mmss(Math.abs(diff)) : '--'; $('#s3').style.color = diff >= 0 ? AC : 'var(--warn)'; }
   else { $('#s3l').textContent = 'Done by'; $('#s3').style.color = ''; $('#s3').textContent = T.goalHit ? 'Done' : T.mi > 0.05 ? clock(new Date(Date.now() + left * T.active / T.mi * 1000)).replace(/\s?[AP]M/i, '') : '--'; }
   const stale = !T.last || Date.now() - T.lastMove > 8000 || T.paused;
@@ -906,9 +1047,9 @@ $('#pause').onclick = () => { if (!T || !T.running) return; T.paused = !T.paused
 $('#discard').onclick = () => {
   const b = $('#discard');
   if (!b.dataset.arm) { b.dataset.arm = 1; toast('Tap X again to discard this workout'); setTimeout(() => delete b.dataset.arm, 3000); return; }
-  endSession(); go('setup');
+  endSession(); go(lastTab);
 };
-$('#finish').onclick = () => {
+function doFinish() {
   if (!T) return;
   if (T.mi < 0.01) { toast('Nothing to save yet. Tap X to cancel.'); return; }
   const rec = { id: Date.now(), date: T.start, act: T.act, goal: T.goal, mi: +T.mi.toFixed(3), secs: Math.round(T.active), splits: T.splits.map(Math.round), hit: T.mi >= T.goal - 0.005, trail: thin(T.trail, 400), route: T.route ? T.route.name : null, top: +T.vTop.toFixed(1) };
@@ -916,25 +1057,44 @@ $('#finish').onclick = () => {
   hist.unshift(rec); store.set('hist', hist);
   if (S.autoPace !== false && rec.mi >= 0.5 && rec.secs > 0) { const act = rec.secs / rec.mi, old = S.pace[rec.act]; if (act > old * 0.6 && act < old * 1.6) { S.pace[rec.act] = Math.round((old * 0.75 + act * 0.25) / 5) * 5; save(); } }
   endSession(); showDone(rec, prev);
-};
+}
+{
+  const f = $('#finish'); let ht = null, hintAt = 0;
+  const cancel = () => { if (!ht) return; clearTimeout(ht); ht = null; f.classList.remove('holding'); if (Date.now() - hintAt > 4000) { hintAt = Date.now(); toast('Hold the check to finish'); } };
+  f.addEventListener('pointerdown', e => { if (!T) return; f.setPointerCapture && f.setPointerCapture(e.pointerId); f.classList.add('holding'); ht = setTimeout(() => { ht = null; f.classList.remove('holding'); chime(2); doFinish(); }, 800); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => f.addEventListener(ev, cancel));
+  f.addEventListener('click', e => { if (e.detail === 0) doFinish(); });
+  f.addEventListener('contextmenu', e => e.preventDefault());
+}
 function thin(a, n) { if (a.length <= n) return a.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); const k = a.length / n, o = []; for (let i = 0; i < n; i++) o.push(a[Math.floor(i * k)]); o.push(a[a.length - 1]); return o.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); }
 function endSession() { if (T) T.done = true; stopGPS(); clearInterval(ticker); ticker = null; store.set('live', null); try { wake && wake.release(); } catch {} wake = null; try { speechSynthesis.cancel(); } catch {} lLayers.route && lMap.removeLayer(lLayers.route); lLayers.trail && lMap.removeLayer(lLayers.trail); lLayers = {}; route = null; T = null; }
 
 /* ---------- done ---------- */
+$('#dDone').onclick = () => go(detailId ? 'you' : 'home');
+$('#dClose').onclick = () => go(detailId ? 'you' : 'home');
+$('#dDel').onclick = () => {
+  const b = $('#dDel');
+  if (!b.dataset.arm) { b.dataset.arm = 1; toast('Tap the trash again to delete this activity'); setTimeout(() => delete b.dataset.arm, 3000); return; }
+  delete b.dataset.arm; hist = hist.filter(x => x.id !== detailId); store.set('hist', hist); toast('Activity deleted'); go('you');
+};
+function openDetail(id) { const r = hist.find(x => x.id === id); if (!r) return; showDone(r, hist.filter(x => x.date < r.date), true); }
 let dMap = null, dLayer = null;
-function showDone(r, prev) {
-  $$('.screen').forEach(e => e.classList.toggle('on', e.id === 's-done')); cur = 'done';
+let detailId = null;
+function showDone(r, prev, detail) {
+  showScreen('done'); detailId = detail ? r.id : null;
+  $('#dDel').hidden = !detail; $('#dDone').textContent = detail ? 'Back' : 'Done';
+  $('#dCheck').style.display = detail ? 'none' : '';
   const d = new Date(r.date), h = d.getHours();
   $('#dWhen').textContent = d.toLocaleDateString([], { weekday: 'short' }) + ' · ' + (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' ' + LABEL[r.act];
   $('#dCheck').className = 'check pop' + (r.hit ? '' : ' miss');
-  $('#dCheck').innerHTML = r.hit ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F3F4EF" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  $('#dCheck').innerHTML = r.hit ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0C0E0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : ringSvg(r.mi / r.goal, 88, 9);
   $('#dHead').textContent = r.hit ? 'Goal reached' : Math.round(r.mi / r.goal * 100) + '% of goal';
   $('#dHead').style.color = r.hit ? AC : 'var(--mu2)';
   $('#dMi').textContent = r.mi.toFixed(2);
   $('#dAvg').textContent = (r.secs ? r.mi / (r.secs / 3600) : 0).toFixed(1); $('#dTop').textContent = (r.top || 0).toFixed(1);
-  const kc = kcal(r); $('#dCal').textContent = kc ? kc : '--'; $('#dCalL').textContent = kc ? 'Calories' : 'Calories*';
+  const kc = kcal(r); $('#dCal').textContent = kc ? kc : '--'; $('#dCalL').textContent = 'Calories';
   $('#gpx').onclick = () => exportGPX(r);
-  $('#dTime').textContent = mmss(r.secs); $('#dPace').textContent = pace(r.secs, r.mi); $('#dGoal').textContent = fmtG(r.goal) + ' mi';
+  $('#dTime').textContent = mmss(r.secs); $('#dPaceL').textContent = r.act === 'bike' ? 'Avg speed' : 'Avg pace'; $('#dPace').textContent = r.act === 'bike' ? mph(r.secs, r.mi) : pace(r.secs, r.mi); $('#dGoal').textContent = fmtG(r.goal) + ' mi';
   const sp = r.splits.slice(); const rem = r.mi - sp.length;
   const rows = sp.map((s, i) => ({ n: 'Mile ' + (i + 1), s }));
   if (rem > 0.05) rows.push({ n: rem.toFixed(2) + ' mi', s: (r.secs - sp.reduce((a, b) => a + b, 0)), p: true });
@@ -954,24 +1114,41 @@ function showDone(r, prev) {
     if (!dMap) dMap = mkMap('doneMap', false);
     setTimeout(() => { dMap.invalidateSize(); dLayer && dMap.removeLayer(dLayer); dLayer = L.polyline(r.trail, { color: AC, weight: 5 }).addTo(dMap); dMap.fitBounds(dLayer.getBounds(), { padding: [20, 20] }); }, 60);
   }
-  $('#share').onclick = async () => { const txt = (r.hit ? 'Hit my goal: ' : '') + r.mi.toFixed(2) + ' mi ' + LABEL[r.act] + ' in ' + mmss(r.secs) + ' (' + pace(r.secs, r.mi) + '/mi) with Goal Miles'; try { if (navigator.share) await navigator.share({ text: txt }); else { await navigator.clipboard.writeText(txt); toast('Copied to clipboard'); } } catch {} };
+  $('#share').onclick = () => shareCard(r);
 }
 
 /* ---------- history ---------- */
-let hF = 'all';
+let hF = 'all', hR = 'week';
+function renderCal(list) {
+  const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1), days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const per = {}; list.forEach(x => { const d = new Date(x.date); if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) per[d.getDate()] = (per[d.getDate()] || 0) + x.mi; });
+  const mx = Math.max(1, ...Object.values(per));
+  let h = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => '<em>' + d + '</em>').join('') + '<span></span>'.repeat(first.getDay());
+  for (let d = 1; d <= days; d++) { const v = per[d] || 0, sz = v ? 14 + Math.round(v / mx * 16) : 0; h += '<span class="' + (d === now.getDate() ? 'td' : '') + (d > now.getDate() ? ' fu' : '') + '">' + (v ? '<i style="width:' + sz + 'px;height:' + sz + 'px"></i>' : '') + '<b>' + d + '</b></span>'; }
+  $('#hCal').innerHTML = h;
+  const n = Object.keys(per).length; $('#hCalT').textContent = now.toLocaleDateString([], { month: 'long' }); $('#hCalN').textContent = n + ' active day' + (n === 1 ? '' : 's');
+  $('#hCal').setAttribute('aria-label', n + ' active days this month');
+}
 const dayKey = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
 function streak(h) { const days = new Set(h.map(x => dayKey(x.date))); let d = dayKey(Date.now()); if (!days.has(d)) d = dayKey(d - 864e5 + 72e5); let n = 0; while (days.has(d)) { n++; d = dayKey(d - 864e5 + 36e5); } return n; }
 let renderHist = function () {
   const list = hist.filter(x => hF === 'all' || x.act === hF);
   $$('#hFilt button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === hF));
-  const today = dayKey(Date.now()), days = [];
-  for (let i = 6; i >= 0; i--) { const k = dayKey(today - i * 864e5 + 36e5 * (i ? 0 : 0)); days.push(k); }
-  const fix = days.map((k, i) => dayKey(today - (6 - i) * 864e5 + 2 * 36e5));
-  const vals = fix.map(k => list.filter(x => dayKey(x.date) === k).reduce((a, b) => a + b.mi, 0));
-  const mx = Math.max(2, ...vals);
-  $('#hChart').innerHTML = fix.map((k, i) => { const v = vals[i], t = i === 6; return '<div><span>' + (v ? v.toFixed(1) : '') + '</span><i class="' + (v ? 'v ' : '') + (t && v ? 'today' : '') + '" style="height:' + (v ? Math.max(8, Math.round(v / mx * 86)) : 4) + 'px"></i><em class="' + (t ? 'today' : '') + '">' + new Date(k).toLocaleDateString([], { weekday: 'narrow' }) + '</em></div>'; }).join('');
-  const wk = vals.reduce((a, b) => a + b, 0);
-  $('#hChart').setAttribute('aria-label', 'Miles per day for the last 7 days, total ' + wk.toFixed(1));
+  const today = dayKey(Date.now()), sum = (t0, t1) => list.filter(x => x.date >= t0 && x.date < t1).reduce((a, b) => a + b.mi, 0);
+  let buckets = [];
+  if (hR === 'week') for (let i = 6; i >= 0; i--) { const k = dayKey(today - i * 864e5 + 2 * 36e5), e = dayKey(k + 26 * 36e5); buckets.push({ v: sum(k, e), l: new Date(k).toLocaleDateString([], { weekday: 'narrow' }), now: i === 0 }); }
+  if (hR === 'month') for (let i = 7; i >= 0; i--) { const k = weekStart(Date.now() - i * 7 * 864e5), e = weekStart(k + 8 * 864e5); buckets.push({ v: sum(k, e), l: (new Date(k).getMonth() + 1) + '/' + new Date(k).getDate(), now: i === 0 }); }
+  if (hR === 'year') for (let i = 11; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); d.setMonth(d.getMonth() - i); const e = new Date(d); e.setMonth(e.getMonth() + 1); buckets.push({ v: sum(d.getTime(), e.getTime()), l: d.toLocaleDateString([], { month: 'narrow' }), now: i === 0 }); }
+  const mx = Math.max(2, ...buckets.map(x => x.v));
+  $('#hChart').style.gridTemplateColumns = 'repeat(' + buckets.length + ',minmax(0,1fr))'; $('#hChart').style.gap = buckets.length > 8 ? '6px' : '10px';
+  $('#hChart').innerHTML = buckets.map(x => '<div><span>' + (x.v ? (x.v >= 100 ? Math.round(x.v) : x.v.toFixed(1)) : '') + '</span><i class="' + (x.v ? 'v ' : '') + (x.now && x.v ? 'today' : '') + '" style="height:' + (x.v ? Math.max(8, Math.round(x.v / mx * 86)) : 4) + 'px"></i><em class="' + (x.now ? 'today' : '') + '">' + x.l + '</em></div>').join('');
+  const tot = buckets.reduce((a, b) => a + b.v, 0);
+  $('#hChartT').textContent = { week: 'Last 7 days', month: 'Last 8 weeks', year: 'Last 12 months' }[hR] + ' · ' + tot.toFixed(1) + ' mi';
+  $$('#hRange button').forEach(b => b.setAttribute('aria-checked', b.dataset.v === hR));
+  $('#hChart').setAttribute('aria-label', 'Miles chart, ' + $('#hChartT').textContent);
+  const fix = [dayKey(today - 6 * 864e5 + 2 * 36e5)];
+  const wk = milesSince(hF, weekStart());
+  renderCal(list);
   $('#hWeek').textContent = wk.toFixed(1);
   const s = streak(hist); $('#hStreak').textContent = s; $('#hStreakU').textContent = s === 1 ? 'day' : 'days';
   const hits = list.filter(x => x.hit && dayKey(x.date) >= fix[0]).length; $('#hGoals').textContent = hits + ' goal' + (hits === 1 ? '' : 's') + ' hit';
@@ -979,9 +1156,11 @@ let renderHist = function () {
   const weeks = {}; list.forEach(x => { const d = new Date(x.date); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); weeks[d.getTime()] = (weeks[d.getTime()] || 0) + x.mi; });
   const bw = Math.max(0, ...Object.values(weeks));
   $('#hBests').innerHTML = [['Fastest mile', splits.length ? mmss(Math.min(...splits)) : '--'], ['Longest', longest ? longest.toFixed(2) + ' mi' : '--'], ['Best week', bw ? bw.toFixed(1) + ' mi' : '--'], ['Total', list.reduce((a, b) => a + b.mi, 0).toFixed(1) + ' mi']].map(([k, v]) => '<div class="kv"><span>' + k + '</span><b>' + v + '</b></div>').join('');
-  $('#hRecent').innerHTML = list.length ? list.slice(0, 15).map(x => { const d = new Date(x.date), h = d.getHours(); return '<div class="rec"><div class="ic' + (x.hit ? '' : ' miss') + '">' + (x.hit ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9BA19B" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg>') + '</div><div class="t"><b>' + (h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening') + ' ' + LABEL[x.act] + '</b><span>' + (dayKey(x.date) === today ? 'Today' : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })) + ' · ' + mmss(x.secs) + ' · ' + (x.hit ? 'goal hit' : 'goal ' + fmtG(x.goal) + ' mi') + '</span></div><span class="d">' + x.mi.toFixed(2) + '</span></div>'; }).join('') : '<div class="msg">No workouts yet. Set a goal and hit start.</div>';
+  $('#hRecent').innerHTML = list.length ? list.slice(0, 40).map(actItem).join('') : '<div class="msg">No workouts yet. Tap the play button to start one.</div>';
+  bindActs('#hRecent');
 }
 const _rh = renderHist; renderHist = function () { _rh(); renderAch(); };
+$$('#hRange button').forEach(b => b.onclick = () => { hR = b.dataset.v; renderHist(); });
 $$('#hFilt button').forEach(b => b.onclick = () => { hF = b.dataset.v; renderHist(); });
 
 
@@ -1150,8 +1329,9 @@ function renderWx() {
   else if (rain) tip = 'Rain around. Watch your footing.';
   else if (wx.w >= 18) tip = 'Windy. Start into the wind, finish with it.';
   else if (wx.f <= 40) tip = 'Cold. Layer up.';
-  e.hidden = false; e.className = 'wx' + (tip ? ' warn' : '');
-  e.innerHTML = '<b>' + Math.round(wx.t) + '°</b> · wind ' + Math.round(wx.w) + ' mph · sunset ' + clock(sun) + (tip ? '<br>' + tip : '');
+  const html = '<b>' + Math.round(wx.t) + '°</b> · wind ' + Math.round(wx.w) + ' mph · sunset ' + clock(sun) + (tip ? '<br>' + tip : '');
+  e.hidden = false; e.className = 'wx' + (tip ? ' warn' : ''); e.innerHTML = html;
+  const h = $('#hmWx'); if (h) { h.hidden = false; h.className = 'wx' + (tip ? ' warn' : ''); h.style.textAlign = 'left'; h.style.margin = '0'; h.innerHTML = html; }
 }
 
 
@@ -1171,12 +1351,12 @@ function calcPaces(o) {
   return { walk: r5(3600 / wm), run: r5(rp), bike: r5(3600 / bm), wt, h, age };
 }
 function openOnb() {
-  ob = { step: 0, act: S.act || 'walk', ft: S.ht ? Math.floor(S.ht / 12) : 5, inch: S.ht ? S.ht % 12 : 10, wt: S.wt || '', age: S.age || '', lvl: S.lvl ?? 1, mile: '' };
+  ob = { step: 0, name: S.name || '', act: S.act || 'walk', ft: S.ht ? Math.floor(S.ht / 12) : 5, inch: S.ht ? S.ht % 12 : 10, wt: S.wt || '', age: S.age || '', lvl: S.lvl ?? 1, mile: '' };
   $('#settings').classList.remove('on'); $('#onb').hidden = false; renderOnb();
 }
 function finishOnb(apply) {
-  if (apply) { const r = calcPaces(ob); S.pace = { walk: r.walk, run: r.run, bike: r.bike }; S.ht = r.h; if (r.wt) S.wt = r.wt; if (ob.age) S.age = +ob.age; S.lvl = ob.lvl; S.act = ob.act; S.autoPace = true; }
-  S.onb = true; save(); $('#onb').hidden = true; renderSetup();
+  if (apply) { const r = calcPaces(ob); S.pace = { walk: r.walk, run: r.run, bike: r.bike }; S.ht = r.h; if (r.wt) S.wt = r.wt; if (ob.age) S.age = +ob.age; S.lvl = ob.lvl; S.act = ob.act; S.autoPace = true; if (ob.name) S.name = ob.name.trim().slice(0, 24); }
+  S.onb = true; save(); $('#onb').hidden = true; renderSetup(); if (TABS.includes(cur)) go(cur);
   if (apply) toast('Paces set. They adjust as you log workouts.');
 }
 function renderOnb() {
@@ -1187,12 +1367,12 @@ function renderOnb() {
   let body = '';
   if (st === 0) body = '<div class="ob-step"><svg width="64" height="64" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="none" stroke="#262A27" stroke-width="9"/><circle cx="40" cy="40" r="30" fill="none" stroke="#D6F94B" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="33" transform="rotate(-90 40 40)"/></svg><h1>Let\'s find<br>your pace</h1><p>Four quick questions and Goal Miles sets a target pace that fits you, for walking, running and biking. It all stays on this phone.</p></div>' + next("Let's go");
   if (st === 1) body = '<div class="ob-step"><h1>What will you<br>do most?</h1><div role="radiogroup" aria-label="Main activity" style="display:flex;flex-direction:column;gap:10px">' + [['walk', 'Walk', 'Daily miles, steady pace'], ['run', 'Run', 'Jogs, 5Ks, training'], ['bike', 'Bike', 'Rides around town or longer']].map(([v, t, d]) => '<button class="ob-opt" role="radio" data-act="' + v + '" aria-checked="' + (ob.act === v) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div></div>' + next('Next');
-  if (st === 2) body = '<div class="ob-step"><h1>About you</h1><p>Taller people stride longer and age and weight change your comfortable pace. Leave anything blank if you\'d rather not say.</p><div class="field"><label>Height</label><div class="ob-row"><select id="obFt" aria-label="Feet">' + [4, 5, 6, 7].map(v => '<option value="' + v + '"' + (v === ob.ft ? ' selected' : '') + '>' + v + ' ft</option>').join('') + '</select><select id="obIn" aria-label="Inches">' + Array.from({ length: 12 }, (_, v) => '<option value="' + v + '"' + (v === ob.inch ? ' selected' : '') + '>' + v + ' in</option>').join('') + '</select></div></div><div class="ob-row"><div class="field"><label for="obWt">Weight (lb)</label><input id="obWt" inputmode="numeric" placeholder="170" value="' + ob.wt + '"></div><div class="field"><label for="obAge">Age</label><input id="obAge" inputmode="numeric" placeholder="25" value="' + ob.age + '"></div></div></div>' + next('Next');
+  if (st === 2) body = '<div class="ob-step"><h1>About you</h1><p>Taller people stride longer and age and weight change your comfortable pace. Leave anything blank if you\'d rather not say.</p><div class="field"><label for="obNm">First name</label><input id="obNm" autocomplete="given-name" placeholder="Optional" value="' + (ob.name || '').replace(/"/g, '') + '"></div><div class="field"><label>Height</label><div class="ob-row"><select id="obFt" aria-label="Feet">' + [4, 5, 6, 7].map(v => '<option value="' + v + '"' + (v === ob.ft ? ' selected' : '') + '>' + v + ' ft</option>').join('') + '</select><select id="obIn" aria-label="Inches">' + Array.from({ length: 12 }, (_, v) => '<option value="' + v + '"' + (v === ob.inch ? ' selected' : '') + '>' + v + ' in</option>').join('') + '</select></div></div><div class="ob-row"><div class="field"><label for="obWt">Weight (lb)</label><input id="obWt" inputmode="numeric" placeholder="170" value="' + ob.wt + '"></div><div class="field"><label for="obAge">Age</label><input id="obAge" inputmode="numeric" placeholder="25" value="' + ob.age + '"></div></div></div>' + next('Next');
   if (st === 3) body = '<div class="ob-step"><h1>How active<br>are you now?</h1><div role="radiogroup" aria-label="Activity level" style="display:flex;flex-direction:column;gap:10px">' + LV.map(([t, d], i) => '<button class="ob-opt" role="radio" data-lvl="' + i + '" aria-checked="' + (ob.lvl === i) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div>' + (ob.act === 'run' ? '<div class="field"><label for="obMile">Recent mile time (optional)</label><input id="obMile" inputmode="numeric" placeholder="9:30" value="' + ob.mile + '"></div>' : '') + '</div>' + next('See my paces');
   if (st === 4) { const r = calcPaces(ob); body = '<div class="ob-step"><h1>Your starting<br>paces</h1><p>Comfortable targets you can hold the whole way. Goal Miles nudges them as you log workouts, and you can change them anytime with Pace target.</p><div class="ob-res">' + [['walk', 'Walk', mmss(r.walk), '/mi'], ['run', 'Run', mmss(r.run), '/mi'], ['bike', 'Bike', (3600 / r.bike).toFixed(1), 'mph']].map(([k, t, v, u]) => '<div class="' + (k === ob.act ? 'me' : '') + '"><span>' + t + '</span><b>' + v + '<small>' + u + '</small></b></div>').join('') + '</div><p class="small">Example: ' + fmtG(2) + ' mi ' + LABEL[ob.act] + ' ≈ ' + Math.round(2 * r[ob.act] / 60) + ' min.</p></div>' + next('Start using Goal Miles'); }
   e.innerHTML = top + body;
   if (ob.shown === st) e.querySelector('.ob-step').style.animation = 'none'; ob.shown = st;
-  const grab = () => { if ($('#obFt')) { ob.ft = +$('#obFt').value; ob.inch = +$('#obIn').value; ob.wt = $('#obWt').value.replace(/[^0-9.]/g, ''); ob.age = $('#obAge').value.replace(/[^0-9]/g, ''); } if ($('#obMile')) ob.mile = $('#obMile').value; };
+  const grab = () => { if ($('#obNm')) ob.name = $('#obNm').value; if ($('#obFt')) { ob.ft = +$('#obFt').value; ob.inch = +$('#obIn').value; ob.wt = $('#obWt').value.replace(/[^0-9.]/g, ''); ob.age = $('#obAge').value.replace(/[^0-9]/g, ''); } if ($('#obMile')) ob.mile = $('#obMile').value; };
   $('#obNext').onclick = () => { grab(); if (st === n) return finishOnb(true); ob.step++; renderOnb(); e.scrollTo(0, 0); };
   if ($('#obBack')) $('#obBack').onclick = () => { grab(); ob.step--; renderOnb(); };
   if ($('#obSkip')) $('#obSkip').onclick = () => finishOnb(false);
@@ -1200,6 +1380,143 @@ function renderOnb() {
   e.querySelectorAll('[data-lvl]').forEach(b => b.onclick = () => { grab(); ob.lvl = +b.dataset.lvl; renderOnb(); });
 }
 $('#redoOnb').onclick = openOnb;
+
+
+/* ---------- shared bits ---------- */
+function thumb(trail, size) {
+  if (!trail || trail.length < 2) return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9BA19B" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>';
+  const k = Math.cos(rad(trail[0][0])), xs = trail.map(p => p[1] * k), ys = trail.map(p => -p[0]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), pad = size * 0.16;
+  const sc = (size - pad * 2) / Math.max(x1 - x0, y1 - y0, 1e-9), ox = (size - (x1 - x0) * sc) / 2, oy = (size - (y1 - y0) * sc) / 2;
+  const step = Math.max(1, Math.floor(trail.length / 120)), idx = [];
+  for (let i = 0; i < trail.length; i += step) idx.push(i);
+  if (idx[idx.length - 1] !== trail.length - 1) idx.push(trail.length - 1);
+  const pts = idx.map(i => ((xs[i] - x0) * sc + ox).toFixed(1) + ',' + ((ys[i] - y0) * sc + oy).toFixed(1)).join(' ');
+  const e = pts.split(' ').pop().split(',');
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="' + AC + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="' + e[0] + '" cy="' + e[1] + '" r="3" fill="#F3F4EF"/></svg>';
+}
+const partOfDay = h => h < 5 ? 'Night' : h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : h < 21 ? 'Evening' : 'Night';
+function actItem(x) {
+  const d = new Date(x.date), today = dayKey(x.date) === dayKey(Date.now()), yest = dayKey(x.date) === dayKey(Date.now() - 864e5);
+  const when = today ? 'Today' : yest ? 'Yesterday' : d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+  return '<button class="act" data-id="' + x.id + '"><div class="th">' + thumb(x.trail, 64) + '</div><div class="t"><b>' + partOfDay(d.getHours()) + ' ' + LABEL[x.act] + '</b><span>' + when + ' · ' + mmss(x.secs) + ' · ' + rateTxt(x.act, x.secs, x.mi) + '</span></div><div class="d">' + x.mi.toFixed(2) + '<small>' + (x.hit ? 'Goal hit' : 'miles') + '</small></div></button>';
+}
+function bindActs(sel) { $$(sel + ' .act').forEach(b => b.onclick = () => openDetail(+b.dataset.id)); }
+const LVLS = [0, 5, 15, 30, 50, 80, 120, 175, 250, 350, 500, 750, 1000, 1500, 2000];
+function level(tot) { let l = 0; while (l < LVLS.length - 1 && tot >= LVLS[l + 1]) l++; const nx = LVLS[l + 1]; return { n: l + 1, next: nx, pct: nx ? (tot - LVLS[l]) / (nx - LVLS[l]) : 1, left: nx ? nx - tot : 0 }; }
+function weekTarget() { const g = goals.find(x => x.type === 'week'); return S.weekGoal || (g && g.n) || { walk: 10, run: 15, bike: 40 }[S.act]; }
+function ringSvg(pct, size, sw) {
+  const r = (size - sw) / 2, c = 2 * Math.PI * r;
+  return '<svg class="r" viewBox="0 0 ' + size + ' ' + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="#22262A" stroke-width="' + sw + '"/><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + AC + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - Math.min(1, pct))).toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/></svg>';
+}
+
+/* ---------- home ---------- */
+function renderHome() {
+  const now = new Date(), h = now.getHours();
+  $('#hmDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+  $('#hmHi').textContent = (h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + (S.name ? ', ' + S.name : '');
+  $('#hmAv').textContent = (S.name || 'G').charAt(0).toUpperCase();
+  const mins = Math.round(S.goal * S.pace[S.act] / 60);
+  const est = mins >= 60 ? Math.floor(mins / 60) + ' hr ' + (mins % 60) + ' min' : mins + ' min';
+  const useRoute = route && route.act === S.act && Math.abs(route.goal - S.goal) < 0.001;
+  const chips = [];
+  if (useRoute) chips.push('<span class="ac">Route: ' + route.name + '</span>');
+  if (S.pacer) chips.push('<span>Pacer ' + targetTxt(S.act) + '</span>');
+  if (S.voice) chips.push('<span>Voice on</span>');
+  if (S.outback) chips.push('<span>Out &amp; back</span>');
+  let html = '';
+  if (!hist.length) html += '<div class="empty"><b>Your first goal<br>starts here.</b><span>Pick a distance, hit start, and Goal Miles counts you down to it with GPS. No guessing where the mile marker is.</span></div>';
+  html += '<div class="hero"><span class="k">Quick start</span><div class="big">' + fmtG(S.goal) + '<small>mi ' + LABEL[S.act] + '</small></div><div class="meta">About ' + est + ' at ' + targetTxt(S.act) + '</div>' + (chips.length ? '<div class="chipz">' + chips.join('') + '</div>' : '') + '<div class="row2"><button class="btn" id="hmStart"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>Start</button><button class="btn ghost" id="hmAdj">Adjust</button></div></div>';
+  const wkMi = milesSince('all', weekStart()), wkN = hist.filter(x => x.date >= weekStart()).length, wkT = hist.filter(x => x.date >= weekStart()).reduce((a, b) => a + b.secs, 0), tgt = weekTarget(), st = streak(hist);
+  html += '<button class="wk" id="hmWk" aria-label="This week: ' + wkMi.toFixed(1) + ' of ' + tgt + ' miles">' + ringSvg(wkMi / tgt, 92, 10) + '<div class="t"><span class="lbl">This week</span><b>' + wkMi.toFixed(1) + '<small>/ ' + fmtG(tgt) + ' mi</small></b><div class="mini"><span><b>' + wkN + '</b>workouts</span><span><b>' + mmss(wkT) + '</b>time</span><span><b style="color:var(--warn)">' + st + '</b>day streak</span></div></div></button>';
+  gAct = S.act;
+  html += '<div class="tip"><svg viewBox="0 0 24 24" fill="none" stroke="#D6F94B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg><span>' + coachTip() + ' <a href="#" id="hmCoach" style="color:var(--ac);font-weight:600;text-decoration:none">Open coach</a></span></div>';
+  const tot = hist.reduce((a, b) => a + b.mi, 0), lv = level(tot);
+  if (lv.next) html += '<div class="ms"><div class="row"><span class="lbl">Level ' + lv.n + '</span><span class="small">' + lv.left.toFixed(1) + ' mi to Level ' + (lv.n + 1) + '</span></div><div class="pbar"><i style="width:' + Math.round(lv.pct * 100) + '%"></i></div></div>';
+  if (hist.length) html += '<div class="sh"><b>Recent</b><button id="hmAll">See all</button></div><div id="hmRecent" style="display:flex;flex-direction:column;gap:8px">' + hist.slice(0, 3).map(actItem).join('') + '</div>';
+  $('#hmMain').innerHTML = html;
+  $('#hmStart').onclick = () => $('#start').click();
+  $('#hmAdj').onclick = () => go('setup');
+  $('#hmWk').onclick = () => go('you');
+  $('#hmCoach').onclick = e => { e.preventDefault(); go('goals'); };
+  if ($('#hmAll')) $('#hmAll').onclick = () => go('you');
+  bindActs('#hmRecent');
+  renderWx();
+}
+$('#hmAv').onclick = () => go('you');
+
+/* ---------- you ---------- */
+function renderYou() {
+  if (!S.since) { S.since = hist.length ? hist[hist.length - 1].date : Date.now(); save(); }
+  const tot = hist.reduce((a, b) => a + b.mi, 0), secs = hist.reduce((a, b) => a + b.secs, 0), lv = level(tot);
+  $('#yAv').textContent = (S.name || 'G').charAt(0).toUpperCase();
+  $('#yName').textContent = S.name || 'You';
+  $('#ySince').textContent = 'Level ' + lv.n + ' · Moving since ' + new Date(Math.min(S.since, ...hist.map(x => x.date))).toLocaleDateString([], { month: 'short', year: 'numeric' });
+  $('#yTot').innerHTML = [[tot.toFixed(1), 'Miles'], [hist.length, 'Workouts'], [(secs / 3600).toFixed(1), 'Hours']].map(([v, l]) => '<div><b>' + v + '</b><small>' + l + '</small></div>').join('');
+  $('#yLvl').innerHTML = '<div class="row"><span><b>Level ' + lv.n + '</b></span><span>' + (lv.next ? lv.left.toFixed(1) + ' mi to Level ' + (lv.n + 1) : 'Max level') + '</span></div><div class="pbar"><i style="width:' + Math.round(lv.pct * 100) + '%"></i></div>';
+  renderHist();
+}
+$('#yAv').onclick = openSettings;
+$('#ySet').onclick = openSettings;
+$('#yPace').onclick = openOnb;
+$('#yGuide').onclick = () => toast('Add to Home Screen from Safari’s Share menu. Keep the screen on during workouts: iPhone pauses GPS for web apps when locked.', 6000);
+
+/* ---------- saved routes ---------- */
+let savedRoutes = store.get('routes', []);
+function renderSaved() {
+  $('#svHead').hidden = !savedRoutes.length; $('#svN').textContent = savedRoutes.length + ' saved';
+  $('#rSaved').innerHTML = savedRoutes.map(r => '<div class="sv"><div class="th">' + thumb(r.coords, 52) + '</div><button class="t" data-sv="' + r.id + '"><b>' + r.name + '</b><span>' + (r.m / M).toFixed(2) + ' mi · ' + r.typeLabel + ' · ' + LABEL[r.act] + '</span></button><button class="x" data-del="' + r.id + '" aria-label="Delete saved route"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>').join('');
+  $$('#rSaved [data-sv]').forEach(b => b.onclick = () => {
+    const r = savedRoutes.find(x => x.id === +b.dataset.sv); if (!r) return;
+    S.act = r.act; S.goal = r.goal; save(); rType = r.type;
+    $$('#rType button').forEach(x => x.setAttribute('aria-checked', x.dataset.v === rType));
+    rOpts = [r]; Object.assign(rOpts, { goal: r.goal, act: r.act, type: r.type }); rPick = 0; syncDist(); drawRoutes();
+    $('#s-route').scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  $$('#rSaved [data-del]').forEach(b => b.onclick = () => { savedRoutes = savedRoutes.filter(x => x.id !== +b.dataset.del); store.set('routes', savedRoutes); renderSaved(); toast('Route removed'); });
+}
+$('#saveRoute').onclick = () => {
+  const r = rOpts[rPick]; if (!r) return;
+  if (savedRoutes.some(x => x.sig === r.coords.length + ':' + r.m.toFixed(0))) return toast('Already saved');
+  savedRoutes.unshift(Object.assign({}, r, { id: Date.now(), sig: r.coords.length + ':' + r.m.toFixed(0) }));
+  savedRoutes = savedRoutes.slice(0, 30); store.set('routes', savedRoutes); renderSaved(); toast('Route saved');
+};
+
+
+/* ---------- share card ---------- */
+async function shareCard(r) {
+  try { await document.fonts.ready; } catch {}
+  const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), F = "'Barlow Condensed', sans-serif", B = "Barlow, sans-serif";
+  g.fillStyle = '#0C0E0D'; g.fillRect(0, 0, W, H);
+  const ring = (x, y, rr, lw) => { g.lineCap = 'round'; g.lineWidth = lw; g.strokeStyle = '#26292D'; g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.stroke(); g.strokeStyle = AC; g.beginPath(); g.arc(x, y, rr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * 300 / 360); g.stroke(); const a = -Math.PI / 2 + Math.PI * 2 * 300 / 360; g.fillStyle = '#0C0E0D'; g.beginPath(); g.arc(x + rr * Math.cos(a), y + rr * Math.sin(a), lw * 1.1, 0, 7); g.fill(); g.fillStyle = AC; g.beginPath(); g.arc(x + rr * Math.cos(a), y + rr * Math.sin(a), lw * .8, 0, 7); g.fill(); };
+  ring(104, 110, 26, 9);
+  g.fillStyle = '#F3F4EF'; g.font = '700 46px ' + F; g.textBaseline = 'middle'; g.fillText('GOAL MILES', 150, 112);
+  const d = new Date(r.date);
+  g.fillStyle = '#9BA19B'; g.font = '600 30px ' + B; g.textAlign = 'right'; g.fillText(d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase(), W - 72, 112); g.textAlign = 'left';
+  const box = { x: 72, y: 200, w: W - 144, h: 560 };
+  g.fillStyle = '#141716'; g.beginPath(); g.roundRect ? g.roundRect(box.x, box.y, box.w, box.h, 36) : g.rect(box.x, box.y, box.w, box.h); g.fill();
+  if (r.trail && r.trail.length > 1) {
+    const k = Math.cos(rad(r.trail[0][0])), xs = r.trail.map(p => p[1] * k), ys = r.trail.map(p => -p[0]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), pad = 70;
+    const sc = Math.min((box.w - pad * 2) / Math.max(x1 - x0, 1e-9), (box.h - pad * 2) / Math.max(y1 - y0, 1e-9));
+    const ox = box.x + (box.w - (x1 - x0) * sc) / 2, oy = box.y + (box.h - (y1 - y0) * sc) / 2;
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    [[26, 'rgba(255,255,255,0.05)'], [12, AC]].forEach(([lw, col]) => { g.lineWidth = lw; g.strokeStyle = col; g.beginPath(); xs.forEach((x, i) => { const px = (x - x0) * sc + ox, py = (ys[i] - y0) * sc + oy; i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke(); });
+    const ex = (xs[xs.length - 1] - x0) * sc + ox, ey = (ys[ys.length - 1] - y0) * sc + oy;
+    g.fillStyle = '#F3F4EF'; g.beginPath(); g.arc(ex, ey, 14, 0, 7); g.fill(); g.strokeStyle = '#0C0E0D'; g.lineWidth = 6; g.stroke();
+  } else ring(W / 2, box.y + box.h / 2, 150, 34);
+  if (r.hit) { g.fillStyle = AC; const t = 'GOAL REACHED'; g.font = '700 30px ' + F; const tw = g.measureText(t).width + 48; g.beginPath(); g.roundRect ? g.roundRect(box.x + 28, box.y + 28, tw, 56, 28) : g.rect(box.x + 28, box.y + 28, tw, 56); g.fill(); g.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--onac').trim() || '#000'; g.fillText(t, box.x + 52, box.y + 57); }
+  g.textBaseline = 'alphabetic'; g.fillStyle = '#F3F4EF'; g.font = '700 250px ' + F; const big = r.mi.toFixed(2); g.fillText(big, 64, 1030);
+  const bw = g.measureText(big).width; g.fillStyle = '#9BA19B'; g.font = '700 80px ' + F; g.fillText('MI ' + LABEL[r.act].toUpperCase(), 64 + bw + 24, 1030);
+  const cols = [['TIME', mmss(r.secs)], [r.act === 'bike' ? 'AVG SPEED' : 'AVG PACE', r.act === 'bike' ? mph(r.secs, r.mi) + ' mph' : pace(r.secs, r.mi) + ' /mi'], ['GOAL', fmtG(r.goal) + ' mi']];
+  cols.forEach(([l, v], i) => { const x = 72 + i * 330; g.fillStyle = '#9BA19B'; g.font = '600 28px ' + B; g.fillText(l, x, 1150); g.fillStyle = '#F3F4EF'; g.font = '600 72px ' + F; g.fillText(v, x, 1230); });
+  g.fillStyle = AC; g.fillRect(72, 1290, 120, 6);
+  const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+  const file = new File([blob], 'goal-miles-' + d.toISOString().slice(0, 10) + '.png', { type: 'image/png' });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) return await navigator.share({ files: [file], text: r.mi.toFixed(2) + ' mi ' + LABEL[r.act] + ' with Goal Miles' }); } catch (e) { if (e.name === 'AbortError') return; }
+  const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(u), 5000); toast('Share card saved');
+}
 
 /* ---------- resume after reload ---------- */
 (function resume() {
@@ -1210,6 +1527,7 @@ $('#redoOnb').onclick = openOnb;
 })();
 
 renderSetup();
+if (!T) go('home');
 loadWeather();
 if (!S.onb && !T) openOnb();
 (function splash() {
@@ -1219,7 +1537,7 @@ if (!S.onb && !T) openOnb();
     if (gone) return; gone = true;
     if (skip) { sp.classList.add('skip'); b.classList.add('fast'); }
     setTimeout(() => sp.remove(), skip ? 200 : 0);
-    setTimeout(() => b.classList.remove('intro', 'fast'), skip ? 600 : 700);
+    setTimeout(() => b.classList.remove('intro', 'fast'), skip ? 600 : 400);
   };
   let seen = false; try { seen = sessionStorage.getItem('gm_splash'); sessionStorage.setItem('gm_splash', 1); } catch {}
   if (T || seen) { sp.remove(); return; }
@@ -1227,7 +1545,7 @@ if (!S.onb && !T) openOnb();
   sp.addEventListener('click', () => done(true));
   Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 250))]).then(() => {
     sp.classList.add('go'); b.classList.add('intro');
-    setTimeout(() => done(false), reduce ? 720 : 1820);
+    setTimeout(() => done(false), reduce ? 1020 : 2620);
   });
 })();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
