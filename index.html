@@ -243,6 +243,31 @@ button:disabled{opacity:.4;cursor:default}
 .wx b{color:var(--mu2);font-weight:600}
 .wx.warn{color:var(--warn)}
 .pacer .best{height:32px;padding:0 10px;border-radius:16px;border:1.5px solid var(--line2);background:transparent;font-size:12.5px;font-weight:600;color:var(--mu2);margin-left:4px;width:auto!important}
+#onb{position:fixed;inset:0;z-index:4500;margin:0 auto;max-width:480px;background:var(--bg);display:flex;flex-direction:column;gap:18px;padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 18px);overflow-y:auto}
+.ob-top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.ob-dots{display:flex;gap:6px}
+.ob-dots i{width:22px;height:4px;border-radius:2px;background:var(--line2)}
+.ob-dots i.on{background:var(--ac)}
+.ob-skip{height:44px;padding:0 6px;border:none;background:transparent;color:var(--mu);font-size:15px;font-weight:600}
+.ob-step{display:flex;flex-direction:column;gap:14px;animation:obIn 280ms var(--ease-out) both}
+@keyframes obIn{from{opacity:0;transform:translateY(12px)}}
+.ob-step h1{margin:0;font:700 40px/1 var(--cond);letter-spacing:.01em;text-transform:uppercase}
+.ob-step p{margin:0;font-size:16px;line-height:1.5;color:var(--mu2)}
+.ob-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:16px;border-radius:16px;background:var(--s1);border:1.5px solid var(--s1);text-align:left;color:var(--tx)}
+.ob-opt b{font-size:17px}.ob-opt span{font-size:13.5px;color:var(--mu)}
+.ob-opt[aria-checked=true]{border-color:var(--ac)}
+.ob-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ob-step select,.ob-step input{width:100%;height:52px;border-radius:12px;border:1.5px solid var(--line2);background:var(--s1);color:var(--tx);padding:0 14px;font-size:17px;-webkit-appearance:none;appearance:none}
+.ob-step select:focus,.ob-step input:focus{border-color:var(--ac);outline:none}
+.ob-res{display:flex;flex-direction:column;padding:4px 16px;border-radius:18px;background:var(--s1)}
+.ob-res div{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.ob-res div:last-child{border-bottom:none}
+.ob-res b{font:600 28px var(--cond);font-variant-numeric:tabular-nums}
+.ob-res b small{font-size:15px;color:var(--mu);margin-left:4px}
+.ob-res span{font-size:15px;color:var(--mu2)}
+.ob-res div.me span{color:var(--tx);font-weight:600}
+.ob-nav{display:flex;gap:10px;margin-top:auto;padding-top:8px}
+.ob-nav .rb{border:1.5px solid var(--line2)}
 #splash{position:fixed;inset:0;z-index:5000;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .sp-in{display:flex;flex-direction:column;align-items:center;gap:16px}
 .sp-ring{width:76px;height:76px}
@@ -329,7 +354,7 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
     <button class="ib" id="shuffle" aria-label="Suggest new routes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
   </div>
   <div class="map" id="rMapBox"><div id="rMap" style="height:100%"></div><div class="ov" id="rOv" style="left:12px;top:12px" hidden><b id="rOvD"></b><span class="muted" id="rOvT"></span></div></div>
-  <div class="dist"><span class="lbl">Distance</span><input type="range" id="rRange" min="0.5" max="26.2" step="0.1" aria-label="Route distance slider, miles"><div class="dbox"><input id="rDist" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Route distance in miles"><span>mi</span></div></div>
+  <div class="dist"><span class="lbl">Distance</span><input type="range" id="rRange" min="0" max="40" step="1" aria-label="Route distance slider, miles"><div class="dbox"><input id="rDist" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" aria-label="Route distance in miles"><span>mi</span></div></div>
   <div class="seg" id="rType" role="radiogroup" aria-label="Route type">
     <button role="radio" data-v="loop">Loop</button><button role="radio" data-v="out">Out &amp; back</button><button role="radio" data-v="one">One way</button>
   </div>
@@ -431,11 +456,13 @@ body.intro.fast #s-setup>*{animation-delay:120ms!important}
     <div class="field"><label for="wt">Your weight in lb (optional)</label><input id="wt" inputmode="numeric" placeholder="For calorie estimates"></div>
     <div class="opt" style="border-top:1px solid var(--line)"><div class="t"><b>Demo mode</b><span>Fake GPS so you can try it from the couch</span></div><button class="sw" role="switch" id="demoSw" aria-label="Demo mode"></button></div>
     <p class="small" style="margin:0"><b style="color:var(--tx)">Keep the screen on while you go.</b> iPhone pauses GPS for web apps when the screen locks. Goal Miles keeps the screen awake, and if you do lock it, it estimates the gap in a straight line when you come back.</p>
+    <button class="btn ghost" id="redoOnb" style="width:100%">Redo pace setup</button>
     <button class="danger" id="clearHist">Clear all history</button>
   </div>
 </div>
 
 <div class="count" id="count" aria-live="assertive"><b id="countN">3</b><span class="lbl" id="countMsg">Finding GPS…</span></div>
+<div id="onb" role="dialog" aria-modal="true" aria-label="Pace setup" hidden></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -542,8 +569,8 @@ gIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault
 gIn.addEventListener('blur', () => commitGoal(true));
 $$('#chips button').forEach(b => b.onclick = () => { S.goal = +b.dataset.v; save(); renderSetup(); });
 $$('.sw[data-k]').forEach(b => b.onclick = () => { S[b.dataset.k] = !S[b.dataset.k]; save(); renderSetup(); });
-$('#pDec').onclick = () => { S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
-$('#pInc').onclick = () => { S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
+$('#pDec').onclick = () => { S.autoPace = false; S.pace[S.act] = Math.max(120, S.pace[S.act] - 15); save(); renderSetup(); };
+$('#pInc').onclick = () => { S.autoPace = false; S.pace[S.act] = Math.min(2400, S.pace[S.act] + 15); save(); renderSetup(); };
 $('#rpClear').onclick = () => { route = null; renderSetup(); };
 $('#toRoute').onclick = () => go('route');
 $('#toHist').onclick = () => go('hist');
@@ -584,17 +611,26 @@ function locate() {
 
 /* ---------- route planner ---------- */
 let rMap = null, rLayers = [];
-function syncDist() { $('#rRange').value = Math.min(26.2, S.goal); if (document.activeElement !== $('#rDist')) $('#rDist').value = fmtG(S.goal); $('#rSub').textContent = fmtG(S.goal) + ' mi ' + LABEL[S.act] + ' from your location'; }
+function distSteps() {
+  const a = []; for (let v = 0.25; v <= 5.001; v += 0.25) a.push(+v.toFixed(2));
+  for (let v = 5.5; v <= 10; v += 0.5) a.push(v); for (let v = 11; v <= 13; v++) a.push(v); a.push(13.1);
+  if (S.act !== 'walk') { for (let v = 14; v <= 26; v++) a.push(v); a.push(26.2); }
+  if (S.act === 'bike') [30, 35, 40, 45, 50, 60, 75, 100].forEach(v => a.push(v));
+  return a;
+}
+let DS = distSteps();
+const nearIdx = g => DS.reduce((bi, v, i) => Math.abs(v - g) < Math.abs(DS[bi] - g) ? i : bi, 0);
+function syncDist() { DS = distSteps(); $('#rRange').max = DS.length - 1; $('#rRange').value = nearIdx(S.goal); if (document.activeElement !== $('#rDist')) $('#rDist').value = fmtG(S.goal); $('#rSub').textContent = fmtG(S.goal) + ' mi ' + LABEL[S.act] + ' from your location'; }
 let distT = null;
 function setRouteDist(v, now) {
   if (!(v > 0)) { syncDist(); return toast('Enter a distance like 4.2'); }
   v = Math.min(100, Math.max(0.1, Math.round(v * 100) / 100));
   if (v === S.goal) { syncDist(); return; }
   S.goal = v; save(); syncDist();
-  clearTimeout(distT); if (S.key) distT = setTimeout(() => { rSeed = 0; genRoutes(); }, now ? 0 : 350);
+  clearTimeout(distT); if (S.key) distT = setTimeout(() => { rSeed = 0; genRoutes(); }, now ? 0 : 700);
 }
-$('#rRange').addEventListener('input', e => { $('#rDist').value = fmtG(+e.target.value); $('#rSub').textContent = fmtG(+e.target.value) + ' mi ' + LABEL[S.act] + ' from your location'; });
-$('#rRange').addEventListener('change', e => setRouteDist(+e.target.value));
+$('#rRange').addEventListener('input', e => { const v = DS[+e.target.value]; $('#rDist').value = fmtG(v); $('#rSub').textContent = fmtG(v) + ' mi ' + LABEL[S.act] + ' from your location'; });
+$('#rRange').addEventListener('change', e => setRouteDist(DS[+e.target.value]));
 $('#rDist').addEventListener('input', e => { const c = e.target.value.replace(/[^0-9.,]/g, ''); if (c !== e.target.value) e.target.value = c; });
 $('#rDist').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } });
 $('#rDist').addEventListener('blur', e => setRouteDist(parseFloat(e.target.value.replace(',', '.')), true));
@@ -614,18 +650,29 @@ function openRoute() {
   if (!rOpts.length || rOpts.goal !== S.goal || rOpts.act !== S.act || rOpts.type !== rType) genRoutes(); else drawRoutes();
 }
 $$('#rType button').forEach(b => b.onclick = () => { rType = b.dataset.v; rSeed = 0; $$('#rType button').forEach(x => x.setAttribute('aria-checked', x === b)); genRoutes(); });
-$('#shuffle').onclick = () => { if (!S.key) return openSettings(); rSeed += 3; genRoutes(); };
+let shufT = 0;
+$('#shuffle').onclick = () => { if (!S.key) return openSettings(); if (Date.now() - shufT < 1500) return; shufT = Date.now(); rSeed += 3; genRoutes(); };
 
+const reqLog = [], rCache = new Map();
+function busyErr(sec) { const e = new Error('The free route service allows about 40 routes a minute. Try again in ' + sec + ' seconds.'); e.busy = true; return e; }
 async function ors(start, end, len, seed) {
   const prof = S.act === 'bike' ? 'cycling-regular' : 'foot-walking';
+  const key = JSON.stringify([prof, start.map(x => x.toFixed(4)), end && end.map(x => x.toFixed(4)), len && Math.round(len / 25), seed]);
+  if (rCache.has(key)) return JSON.parse(rCache.get(key));
+  const now = Date.now(); while (reqLog.length && now - reqLog[0] > 60000) reqLog.shift();
+  if (reqLog.length >= 34) throw busyErr(Math.ceil((60000 - (now - reqLog[0])) / 1000));
+  reqLog.push(now);
   const body = { coordinates: end ? [[start[1], start[0]], [end[1], end[0]]] : [[start[1], start[0]]], instructions: true, units: 'm', preference: 'recommended' };
   if (!end) body.options = { round_trip: { length: Math.round(len), points: 4, seed } };
-  const r = await fetch('https://api.openrouteservice.org/v2/directions/' + prof + '/geojson', { method: 'POST', headers: { 'Authorization': S.key, 'Content-Type': 'application/json', 'Accept': 'application/geo+json, application/json' }, body: JSON.stringify(body) });
+  let r;
+  try { r = await fetch('https://api.openrouteservice.org/v2/directions/' + prof + '/geojson', { method: 'POST', headers: { 'Authorization': S.key, 'Content-Type': 'application/json', 'Accept': 'application/geo+json, application/json' }, body: JSON.stringify(body) }); } catch { throw busyErr(45); }
   if (!r.ok) { let m = 'Route service error ' + r.status; if (r.status === 401 || r.status === 403) m = 'That route key didn\'t work. Check it in Settings.'; if (r.status === 429) m = 'Too many route requests. Wait a minute.'; const e = new Error(m); e.fatal = r.status < 500; throw e; }
   const f = (await r.json()).features[0];
   const coords = f.geometry.coordinates.map(c => [c[1], c[0]]);
   const steps = f.properties.segments.flatMap(s => s.steps).map(s => ({ i: s.way_points[0], text: s.instruction, type: s.type }));
-  return { coords, steps, m: f.properties.summary.distance };
+  const out = { coords, steps, m: f.properties.summary.distance };
+  rCache.set(key, JSON.stringify(out));
+  return out;
 }
 function finishRoute(r, type, start) {
   const cum = [0]; for (let i = 1; i < r.coords.length; i++) cum.push(cum[i - 1] + hav(r.coords[i - 1], r.coords[i]));
@@ -640,12 +687,12 @@ function finishRoute(r, type, start) {
 }
 async function makeLoop(start, target, seed) {
   let r = await ors(start, null, target, seed);
-  if (Math.abs(r.m - target) / target > 0.06) { const r2 = await ors(start, null, target * target / r.m, seed); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
+  if (Math.abs(r.m - target) / target > 0.1) { const r2 = await ors(start, null, target * target / r.m, seed); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
   return finishRoute(r, 'loop', start);
 }
 async function makeLine(start, target, brg, type) {
-  let d = target * 0.7, r = await ors(start, dest(start, brg, d));
-  if (Math.abs(r.m - target) / target > 0.05) { d *= target / r.m; const r2 = await ors(start, dest(start, brg, d)); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
+  let d = target / 1.35, r = await ors(start, dest(start, brg, d));
+  if (Math.abs(r.m - target) / target > 0.12) { d *= target / r.m; const r2 = await ors(start, dest(start, brg, d)); if (Math.abs(r2.m - target) < Math.abs(r.m - target)) r = r2; }
   if (type === 'out') {
     const n = r.coords.length;
     r.outIdx = n - 1;
@@ -654,7 +701,9 @@ async function makeLine(start, target, brg, type) {
   }
   return finishRoute(r, type, start);
 }
+let genId = 0;
 async function genRoutes() {
+  const my = ++genId;
   const box = $('#rList');
   box.innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
   $('#useRoute').disabled = true; $('#gmaps').hidden = true; $('#rOv').hidden = true;
@@ -668,9 +717,10 @@ async function genRoutes() {
     else jobs.push(makeLine(start, rType === 'out' ? target / 2 : target, base + i * 120, rType));
   }
   const res = await Promise.allSettled(jobs);
+  if (my !== genId) return;
   rOpts = res.filter(x => x.status === 'fulfilled').map(x => x.value);
   Object.assign(rOpts, { goal: S.goal, act: S.act, type: rType });
-  if (!rOpts.length) { const e = res.find(x => x.status === 'rejected'); box.innerHTML = '<div class="msg"><b>Couldn\'t build routes.</b> ' + (e ? e.reason.message : '') + '</div>'; return; }
+  if (!rOpts.length) { const e = res.find(x => x.status === 'rejected'); box.innerHTML = '<div class="msg"><b>Couldn\'t build routes.</b> ' + (e ? e.reason.message : '') + '<br><button class="btn ghost" id="rRetry" style="width:100%">Try again</button></div>'; $('#rRetry').onclick = genRoutes; return; }
   rOpts.sort((a, b) => Math.abs(a.m - target) - Math.abs(b.m - target));
   rPick = 0; drawRoutes();
 }
@@ -864,6 +914,7 @@ $('#finish').onclick = () => {
   const rec = { id: Date.now(), date: T.start, act: T.act, goal: T.goal, mi: +T.mi.toFixed(3), secs: Math.round(T.active), splits: T.splits.map(Math.round), hit: T.mi >= T.goal - 0.005, trail: thin(T.trail, 400), route: T.route ? T.route.name : null, top: +T.vTop.toFixed(1) };
   const prev = hist.slice();
   hist.unshift(rec); store.set('hist', hist);
+  if (S.autoPace !== false && rec.mi >= 0.5 && rec.secs > 0) { const act = rec.secs / rec.mi, old = S.pace[rec.act]; if (act > old * 0.6 && act < old * 1.6) { S.pace[rec.act] = Math.round((old * 0.75 + act * 0.25) / 5) * 5; save(); } }
   endSession(); showDone(rec, prev);
 };
 function thin(a, n) { if (a.length <= n) return a.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); const k = a.length / n, o = []; for (let i = 0; i < n; i++) o.push(a[Math.floor(i * k)]); o.push(a[a.length - 1]); return o.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]); }
@@ -1103,6 +1154,53 @@ function renderWx() {
   e.innerHTML = '<b>' + Math.round(wx.t) + '°</b> · wind ' + Math.round(wx.w) + ' mph · sunset ' + clock(sun) + (tip ? '<br>' + tip : '');
 }
 
+
+/* ---------- pace setup (onboarding) ---------- */
+const LV = [['Getting started', 'Rarely exercise right now'], ['Light', '1–2 days a week'], ['Regular', '3–4 days a week'], ['Very active', '5+ days a week']];
+let ob = null;
+function calcPaces(o) {
+  const h = o.ft * 12 + o.inch, wt = parseFloat(o.wt) || 0, age = parseFloat(o.age) || 30, bmi = wt ? 703 * wt / (h * h) : 24, l = o.lvl;
+  let wm = [2.8, 3.1, 3.4, 3.7][l] * Math.sqrt(h / 68);
+  if (age > 60) wm -= Math.min(0.6, (age - 60) * 0.02); if (bmi > 30) wm -= 0.15;
+  wm = Math.min(4.3, Math.max(2.2, wm));
+  let rp = [750, 660, 585, 525][l] * (1 + Math.min(0.35, Math.max(0, age - 35) * 0.008 + Math.max(0, bmi - 25) * 0.025));
+  const mt = /^(\d{1,2}):(\d{2})$/.exec((o.mile || '').trim()); if (mt) rp = (+mt[1] * 60 + +mt[2]) * 1.22;
+  rp = Math.min(1080, Math.max(330, rp));
+  const bm = [10, 12, 14, 16][l] * (age > 55 ? 0.92 : 1) * (bmi > 30 ? 0.93 : 1);
+  const r5 = x => Math.round(x / 5) * 5;
+  return { walk: r5(3600 / wm), run: r5(rp), bike: r5(3600 / bm), wt, h, age };
+}
+function openOnb() {
+  ob = { step: 0, act: S.act || 'walk', ft: S.ht ? Math.floor(S.ht / 12) : 5, inch: S.ht ? S.ht % 12 : 10, wt: S.wt || '', age: S.age || '', lvl: S.lvl ?? 1, mile: '' };
+  $('#settings').classList.remove('on'); $('#onb').hidden = false; renderOnb();
+}
+function finishOnb(apply) {
+  if (apply) { const r = calcPaces(ob); S.pace = { walk: r.walk, run: r.run, bike: r.bike }; S.ht = r.h; if (r.wt) S.wt = r.wt; if (ob.age) S.age = +ob.age; S.lvl = ob.lvl; S.act = ob.act; S.autoPace = true; }
+  S.onb = true; save(); $('#onb').hidden = true; renderSetup();
+  if (apply) toast('Paces set. They adjust as you log workouts.');
+}
+function renderOnb() {
+  const e = $('#onb'), n = 4, st = ob.step;
+  const top = '<div class="ob-top"><div class="ob-dots" aria-label="Step ' + (st + 1) + ' of ' + (n + 1) + '">' + Array.from({ length: n + 1 }, (_, i) => '<i class="' + (i <= st ? 'on' : '') + '"></i>').join('') + '</div>' + (st < n ? '<button class="ob-skip" id="obSkip">Skip</button>' : '<span></span>') + '</div>';
+  const back = st > 0 ? '<button class="rb" id="obBack" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>' : '';
+  const next = (t) => '<div class="ob-nav">' + back + '<button class="btn" id="obNext">' + t + '</button></div>';
+  let body = '';
+  if (st === 0) body = '<div class="ob-step"><svg width="64" height="64" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30" fill="none" stroke="#262A27" stroke-width="9"/><circle cx="40" cy="40" r="30" fill="none" stroke="#D6F94B" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="33" transform="rotate(-90 40 40)"/></svg><h1>Let\'s find<br>your pace</h1><p>Four quick questions and Goal Miles sets a target pace that fits you, for walking, running and biking. It all stays on this phone.</p></div>' + next("Let's go");
+  if (st === 1) body = '<div class="ob-step"><h1>What will you<br>do most?</h1><div role="radiogroup" aria-label="Main activity" style="display:flex;flex-direction:column;gap:10px">' + [['walk', 'Walk', 'Daily miles, steady pace'], ['run', 'Run', 'Jogs, 5Ks, training'], ['bike', 'Bike', 'Rides around town or longer']].map(([v, t, d]) => '<button class="ob-opt" role="radio" data-act="' + v + '" aria-checked="' + (ob.act === v) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div></div>' + next('Next');
+  if (st === 2) body = '<div class="ob-step"><h1>About you</h1><p>Taller people stride longer and age and weight change your comfortable pace. Leave anything blank if you\'d rather not say.</p><div class="field"><label>Height</label><div class="ob-row"><select id="obFt" aria-label="Feet">' + [4, 5, 6, 7].map(v => '<option value="' + v + '"' + (v === ob.ft ? ' selected' : '') + '>' + v + ' ft</option>').join('') + '</select><select id="obIn" aria-label="Inches">' + Array.from({ length: 12 }, (_, v) => '<option value="' + v + '"' + (v === ob.inch ? ' selected' : '') + '>' + v + ' in</option>').join('') + '</select></div></div><div class="ob-row"><div class="field"><label for="obWt">Weight (lb)</label><input id="obWt" inputmode="numeric" placeholder="170" value="' + ob.wt + '"></div><div class="field"><label for="obAge">Age</label><input id="obAge" inputmode="numeric" placeholder="25" value="' + ob.age + '"></div></div></div>' + next('Next');
+  if (st === 3) body = '<div class="ob-step"><h1>How active<br>are you now?</h1><div role="radiogroup" aria-label="Activity level" style="display:flex;flex-direction:column;gap:10px">' + LV.map(([t, d], i) => '<button class="ob-opt" role="radio" data-lvl="' + i + '" aria-checked="' + (ob.lvl === i) + '"><b>' + t + '</b><span>' + d + '</span></button>').join('') + '</div>' + (ob.act === 'run' ? '<div class="field"><label for="obMile">Recent mile time (optional)</label><input id="obMile" inputmode="numeric" placeholder="9:30" value="' + ob.mile + '"></div>' : '') + '</div>' + next('See my paces');
+  if (st === 4) { const r = calcPaces(ob); body = '<div class="ob-step"><h1>Your starting<br>paces</h1><p>Comfortable targets you can hold the whole way. Goal Miles nudges them as you log workouts, and you can change them anytime with Pace target.</p><div class="ob-res">' + [['walk', 'Walk', mmss(r.walk), '/mi'], ['run', 'Run', mmss(r.run), '/mi'], ['bike', 'Bike', (3600 / r.bike).toFixed(1), 'mph']].map(([k, t, v, u]) => '<div class="' + (k === ob.act ? 'me' : '') + '"><span>' + t + '</span><b>' + v + '<small>' + u + '</small></b></div>').join('') + '</div><p class="small">Example: ' + fmtG(2) + ' mi ' + LABEL[ob.act] + ' ≈ ' + Math.round(2 * r[ob.act] / 60) + ' min.</p></div>' + next('Start using Goal Miles'); }
+  e.innerHTML = top + body;
+  if (ob.shown === st) e.querySelector('.ob-step').style.animation = 'none'; ob.shown = st;
+  const grab = () => { if ($('#obFt')) { ob.ft = +$('#obFt').value; ob.inch = +$('#obIn').value; ob.wt = $('#obWt').value.replace(/[^0-9.]/g, ''); ob.age = $('#obAge').value.replace(/[^0-9]/g, ''); } if ($('#obMile')) ob.mile = $('#obMile').value; };
+  $('#obNext').onclick = () => { grab(); if (st === n) return finishOnb(true); ob.step++; renderOnb(); e.scrollTo(0, 0); };
+  if ($('#obBack')) $('#obBack').onclick = () => { grab(); ob.step--; renderOnb(); };
+  if ($('#obSkip')) $('#obSkip').onclick = () => finishOnb(false);
+  e.querySelectorAll('[data-act]').forEach(b => b.onclick = () => { ob.act = b.dataset.act; renderOnb(); });
+  e.querySelectorAll('[data-lvl]').forEach(b => b.onclick = () => { grab(); ob.lvl = +b.dataset.lvl; renderOnb(); });
+}
+$('#redoOnb').onclick = openOnb;
+
 /* ---------- resume after reload ---------- */
 (function resume() {
   const L0 = store.get('live', null);
@@ -1113,6 +1211,7 @@ function renderWx() {
 
 renderSetup();
 loadWeather();
+if (!S.onb && !T) openOnb();
 (function splash() {
   const sp = $('#splash'), b = document.body;
   let gone = false;
